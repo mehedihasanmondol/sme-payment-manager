@@ -46,6 +46,29 @@ public partial class DashboardViewModel : ViewModelBase
 
     [ObservableProperty]
     private bool _isLoading;
+    
+    // Mobile Payment Stats
+    [ObservableProperty]
+    private int _mobilePaymentCount;
+    
+    [ObservableProperty]
+    private decimal _mobilePaymentAmount;
+    
+    // Electricity Token Stats
+    [ObservableProperty]
+    private int _electricityTokenCount;
+    
+    [ObservableProperty]
+    private decimal _electricityTokenAmount;
+    
+    [ObservableProperty]
+    private decimal _totalEnergyCost;
+    
+    [ObservableProperty]
+    private decimal _totalMeterRent;
+    
+    [ObservableProperty]
+    private decimal _totalDemandCharge;
 
     public DashboardViewModel()
     {
@@ -71,6 +94,17 @@ public partial class DashboardViewModel : ViewModelBase
             NagadAmount = stats.NagadAmount;
             RocketAmount = stats.RocketAmount;
             OtherAmount = stats.OtherAmount;
+            
+            // Type-specific stats
+            MobilePaymentCount = stats.MobilePaymentCount;
+            MobilePaymentAmount = stats.MobilePaymentAmount;
+            ElectricityTokenCount = stats.ElectricityTokenCount;
+            ElectricityTokenAmount = stats.ElectricityTokenAmount;
+            
+            // Electricity-specific
+            TotalEnergyCost = stats.TotalEnergyCost;
+            TotalMeterRent = stats.TotalMeterRent;
+            TotalDemandCharge = stats.TotalDemandCharge;
         }
         finally
         {

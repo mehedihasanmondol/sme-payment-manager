@@ -58,38 +58,135 @@
                                FontWeight="SemiBold"
                                Margin="0,0,0,15"/>
                     
+                    
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         
+                        <!-- Left Column - Common andMobile Payment Fields -->
                         <StackPanel Grid.Column="0" Margin="0,0,10,0">
-                            <Label Content="Provider:"/>
-                            <TextBox Text="{Binding ParsedPayment.Provider}" 
+                            <Label Content="Payment Type:"/>
+                            <TextBox Text="{Binding ParsedPayment.Type}" 
                                      IsReadOnly="True"
-                                     Background="#ecf0f1"/>
+                                     Background="#ecf0f1"
+                                     FontWeight="Bold"/>
+                            
+                            <Label Content="Amount (৳):"/>
+                            <TextBox Text="{Binding ParsedPayment.Amount, StringFormat=N2}" 
+                                     IsReadOnly="True"
+                                     Background="#ecf0f1"
+                                     FontSize="18"
+                                     FontWeight="Bold"
+                                     Foreground="#27ae60"/>
                             
                             <Label Content="Transaction ID:"/>
                             <TextBox Text="{Binding ParsedPayment.TransactionId}" 
                                      IsReadOnly="True"
                                      Background="#ecf0f1"/>
                             
-                            <Label Content="Amount (৳):"/>
-                            <TextBox Text="{Binding ParsedPayment.Amount, StringFormat=N2}" 
+                            <!-- Mobile Payment Specific -->
+                            <Label Content="Provider:"
+                                   Visibility="{Binding ParsedPayment.Type, Converter={StaticResource StringToVisibilityConverter}}"/>
+                            <TextBox Text="{Binding ParsedPayment.Provider}" 
                                      IsReadOnly="True"
                                      Background="#ecf0f1"
-                                     FontSize="16"
-                                     FontWeight="Bold"
-                                     Foreground="#27ae60"/>
-                        </StackPanel>
-                        
-                        <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                            <Label Content="Phone Number:"/>
+                                     Visibility="{Binding ParsedPayment.Type, Converter={StaticResource StringToVisibilityConverter}}"/>
+                            
+                            <Label Content="Phone Number:"
+                                   Visibility="{Binding ParsedPayment.Type, Converter={StaticResource StringToVisibilityConverter}}"/>
                             <TextBox Text="{Binding ParsedPayment.PhoneNumber}" 
                                      IsReadOnly="True"
-                                     Background="#ecf0f1"/>
+                                     Background="#ecf0f1"
+                                     Visibility="{Binding ParsedPayment.Type, Converter={StaticResource StringToVisibilityConverter}}"/>
                             
+                            <!-- Electricity Token Specific - Left Column -->
+                            <Label Content="Meter Number:"
+                                   Visibility="{Binding ParsedPayment.MeterNumber, Converter={StaticResource StringToVisibilityConverter}}"/>
+                            <TextBox Text="{Binding ParsedPayment.MeterNumber}" 
+                                     IsReadOnly="True"
+                                     Background="#ecf0f1"
+                                     FontWeight="Bold"
+                                     Visibility="{Binding ParsedPayment.MeterNumber, Converter={StaticResource StringToVisibilityConverter}}"/>
+                            
+                            <Label Content="Token Number:"
+                                   Visibility="{Binding ParsedPayment.Token, Converter={StaticResource StringToVisibilityConverter}}"/>
+                            <TextBox Text="{Binding ParsedPayment.Token}" 
+                                     IsReadOnly="True"
+                                     Background="#fff3cd"
+                                     FontWeight="Bold"
+                                     FontSize="14"
+                                     Foreground="#856404"
+                                     Visibility="{Binding ParsedPayment.Token, Converter={StaticResource StringToVisibilityConverter}}"/>
+                            
+                            <Label Content="Sequence Number:"
+                                   Visibility="{Binding ParsedPayment.SequenceNumber, Converter={StaticResource StringToVisibilityConverter}}"/>
+                            <TextBox Text="{Binding ParsedPayment.SequenceNumber}" 
+                                     IsReadOnly="True"
+                                     Background="#ecf0f1"
+                                     Visibility="{Binding ParsedPayment.SequenceNumber, Converter={StaticResource StringToVisibilityConverter}}"/>
+                        </StackPanel>
+                        
+                        <!-- Right Column - Electricity Cost Breakdown or Customer Info -->
+                        <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                            <!-- Electricity Cost Breakdown -->
+                            <TextBlock Text="Cost Breakdown" 
+                                       FontWeight="SemiBold"
+                                       FontSize="14"
+                                       Margin="0,0,0,10"
+                                       Visibility="{Binding ParsedPayment.EnergyCost, Converter={StaticResource StringToVisibilityConverter}}"/>
+                            
+                            <Grid Visibility="{Binding ParsedPayment.EnergyCost, Converter={StaticResource StringToVisibilityConverter}}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Energy Cost:" Margin="0,5"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ParsedPayment.EnergyCost, StringFormat='৳{0:N2}'}" Margin="10,5" FontWeight="Bold"/>
+                                
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Meter Rent:" Margin="0,5"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ParsedPayment.MeterRent, StringFormat='৳{0:N2}'}" Margin="10,5"/>
+                                
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Demand Charge:" Margin="0,5"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ParsedPayment.DemandCharge, StringFormat='৳{0:N2}'}" Margin="10,5"/>
+                                
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="VAT:" Margin="0,5"/>
+                                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding ParsedPayment.VAT, StringFormat='৳{0:N2}'}" Margin="10,5"/>
+                                
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="Rebate:" Margin="0,5"/>
+                                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding ParsedPayment.Rebate, StringFormat='৳{0:N2}'}" Margin="10,5" Foreground="#e74c3c"/>
+                                
+                                <TextBlock Grid.Row="5" Grid.Column="0" Text="Arrear:" Margin="0,5"/>
+                                <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding ParsedPayment.ArrearAmount, StringFormat='৳{0:N2}'}" Margin="10,5"/>
+                                
+                                <Border Grid.Row="6" Grid.ColumnSpan="2" 
+                                        BorderBrush="#27ae60" 
+                                        BorderThickness="0,2,0,0" 
+                                        Margin="0,10,0,5"
+                                        Padding="0,10,0,0">
+                                    <Grid>
+                                        <TextBlock Grid.Column="0" Text="Vending Amount:" FontWeight="Bold"/>
+                                        <TextBlock Grid.Column="1" HorizontalAlignment="Right" 
+                                                   Text="{Binding ParsedPayment.VendingAmount, StringFormat='৳{0:N2}'}" 
+                                                   FontWeight="Bold" 
+                                                   FontSize="16"
+                                                   Foreground="#27ae60"/>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                            
+                            <!-- Customer Info (for both types) -->
                             <Label Content="Customer Name (Optional):"/>
                             <TextBox Text="{Binding ParsedPayment.CustomerName, UpdateSourceTrigger=PropertyChanged}"/>
                             
@@ -128,11 +225,18 @@
                     <TextBlock TextWrapping="Wrap" 
                                FontSize="12"
                                Foreground="#7f8c8d">
+                        <Run Text="Mobile Payments:" FontWeight="Bold"/>
+                        <LineBreak/><LineBreak/>
                         <Run Text="bKash: "/>
                         <Run Text="You have received Tk 1,500.00 from 01711XXXXXX. TrxID ABC123XYZ at 25/12/2025 10:30 PM."/>
                         <LineBreak/><LineBreak/>
                         <Run Text="Nagad: "/>
                         <Run Text="You have received ৳1,500.00 from 01711XXXXXX. Transaction ID: ABC123XYZ Date: 25/12/2025 10:30 PM."/>
+                        <LineBreak/><LineBreak/><LineBreak/>
+                        <Run Text="Electricity Tokens:" FontWeight="Bold"/>
+                        <LineBreak/><LineBreak/>
+                        <Run Text="BREB: "/>
+                        <Run Text="BREB Token Purchase Successful. Meter No: 40110356142 Sequence: 67 Energy Cost: 344.79 Meter Rent: 40 Demand Charge: 84 VAT: 23.33 Rebate: -2.12 Vending Amount: 490.00 Token(s): 2357-2027-3645-9272-4484 Trx ID: 74PVD2QU"/>
                     </TextBlock>
                 </StackPanel>
             </Border>

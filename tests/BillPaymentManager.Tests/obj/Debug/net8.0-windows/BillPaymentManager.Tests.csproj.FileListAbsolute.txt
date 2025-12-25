@@ -147,3 +147,4 @@ C:\Users\Love Station\Documents\sme-payment-manager\tests\BillPaymentManager.Tes
 C:\Users\Love Station\Documents\sme-payment-manager\tests\BillPaymentManager.Tests\obj\Debug\net8.0-windows\BillPaymentManager.Tests.pdb
 C:\Users\Love Station\Documents\sme-payment-manager\tests\BillPaymentManager.Tests\obj\Debug\net8.0-windows\BillPaymentManager.Tests.genruntimeconfig.cache
 C:\Users\Love Station\Documents\sme-payment-manager\tests\BillPaymentManager.Tests\obj\Debug\net8.0-windows\ref\BillPaymentManager.Tests.dll
+C:\Users\Love Station\Documents\sme-payment-manager\tests\BillPaymentManager.Tests\obj\Debug\net8.0-windows\BillPaymentManager.Tests.sourcelink.json

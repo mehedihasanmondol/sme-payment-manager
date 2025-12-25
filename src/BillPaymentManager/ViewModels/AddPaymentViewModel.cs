@@ -53,7 +53,10 @@ public partial class AddPaymentViewModel : ViewModelBase
         if (ParsedPayment != null)
         {
             IsParsed = true;
-            StatusMessage = $"SMS parsed successfully! Provider: {ParsedPayment.Provider}";
+            var typeMsg = ParsedPayment.Type == PaymentType.MobilePayment 
+                ? $"Mobile Payment ({ParsedPayment.Provider})" 
+                : "Electricity Token";
+            StatusMessage = $"SMS parsed successfully! Type: {typeMsg}";
         }
         else
         {

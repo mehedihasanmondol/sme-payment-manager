@@ -105,8 +105,7 @@ public partial class HistoryViewModel : ViewModelBase
     {
         if (SelectedPayment != null)
         {
-            _printService.PrintReceipt(SelectedPayment);
-            MessageBox.Show("Receipt sent to printer", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            _printService.ShowPrintPreview(SelectedPayment);
         }
     }
 

@@ -4,14 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="1200">
+             d:DesignHeight="700" d:DesignWidth="1000">
     
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="2*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
         <!-- Header -->
@@ -32,138 +33,346 @@
                 
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     
-                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                    <StackPanel Grid.Column="0" Margin="0,0,15,0">
                         <Label Content="Start Date:"/>
-                        <DatePicker SelectedDate="{Binding StartDate}"/>
-                        
-                        <Label Content="End Date:"/>
-                        <DatePicker SelectedDate="{Binding EndDate}"/>
+                        <DatePicker SelectedDate="{Binding StartDate}" Width="150"/>
                     </StackPanel>
                     
-                    <StackPanel Grid.Column="1" Margin="10,0">
-                        <Label Content="Search (Meter, Token, Transaction ID, Customer):"/>
+                    <StackPanel Grid.Column="1" Margin="0,0,15,0">
+                        <Label Content="End Date:"/>
+                        <DatePicker SelectedDate="{Binding EndDate}" Width="150"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Column="2" Margin="0,0,15,0">
+                        <Label Content="Search:"/>
                         <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                                  Height="32"
-                                 VerticalContentAlignment="Center"/>
+                                 VerticalContentAlignment="Center"
+                                 ToolTip="Search by meter number, token, transaction ID, or customer name"/>
                     </StackPanel>
                     
-                    <StackPanel Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Bottom">
-                        <Button Content="🔍 Apply Filter" 
+                    <StackPanel Grid.Column="3" VerticalAlignment="Bottom">
+                        <Button Content="🔍 Filter" 
                                 Command="{Binding ApplyFilterCommand}"
-                                Style="{StaticResource PrimaryButtonStyle}"/>
-                        <Button Content="🔄 Clear Filter" 
+                                Style="{StaticResource PrimaryButtonStyle}"
+                                Width="100"/>
+                        <Button Content="🔄 Clear" 
                                 Command="{Binding ClearFilterCommand}"
-                                Style="{StaticResource DangerButtonStyle}"/>
+                                Style="{StaticResource DangerButtonStyle}"
+                                Width="100"
+                                Margin="0,5,0,0"/>
                     </StackPanel>
                 </Grid>
             </StackPanel>
         </Border>
         
-        <!-- Data Grid -->
-        <Border Grid.Row="2" Style="{StaticResource CardStyle}">
-            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                <DataGrid ItemsSource="{Binding Payments}"
-                          SelectedItem="{Binding SelectedPayment}"
-                          AutoGenerateColumns="False"
-                          IsReadOnly="True"
-                          SelectionMode="Single"
-                          CanUserAddRows="False"
-                          CanUserDeleteRows="False"
-                          GridLinesVisibility="Horizontal"
-                          HeadersVisibility="Column"
-                          AlternatingRowBackground="#f8f9fa"
-                          MinWidth="1100">
+        <!-- Simplified Data Grid - Main List -->
+        <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,0,0,10">
+            <DataGrid ItemsSource="{Binding Payments}"
+                      SelectedItem="{Binding SelectedPayment}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      SelectionMode="Single"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      GridLinesVisibility="Horizontal"
+                      HeadersVisibility="Column"
+                      AlternatingRowBackground="#f8f9fa"
+                      RowHeight="35"
+                      FontSize="13">
+                
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Date" 
+                                        Binding="{Binding PaymentDate, StringFormat=dd/MM/yyyy}" 
+                                        Width="100"/>
                     
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Date" 
-                                            Binding="{Binding PaymentDate, StringFormat=dd/MM/yyyy}" 
-                                            Width="90"/>
-                        
-                        <DataGridTextColumn Header="Meter No" 
-                                            Binding="{Binding MeterNumber}" 
-                                            Width="110"/>
-                        
-                        <DataGridTextColumn Header="Token Number" 
-                                            Binding="{Binding Token}" 
-                                            Width="170">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="FontFamily" Value="Courier New"/>
-                                    <Setter Property="FontWeight" Value="Bold"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-                        
-                        <DataGridTextColumn Header="Seq" 
-                                            Binding="{Binding SequenceNumber}" 
-                                            Width="45"/>
-                        
-                        <DataGridTextColumn Header="Energy" 
-                                            Binding="{Binding EnergyCost, StringFormat='৳{0:N2}'}" 
-                                            Width="80"/>
-                        
-                        <DataGridTextColumn Header="Rent" 
-                                            Binding="{Binding MeterRent, StringFormat='৳{0:N2}'}" 
-                                            Width="70"/>
-                        
-                        <DataGridTextColumn Header="Demand" 
-                                            Binding="{Binding DemandCharge, StringFormat='৳{0:N2}'}" 
-                                            Width="75"/>
-                        
-                        <DataGridTextColumn Header="VAT" 
-                                            Binding="{Binding VAT, StringFormat='৳{0:N2}'}" 
-                                            Width="65"/>
-                        
-                        <DataGridTextColumn Header="Rebate" 
-                                            Binding="{Binding Rebate, StringFormat='৳{0:N2}'}" 
-                                            Width="70">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Foreground" Value="#e74c3c"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-                        
-                        <DataGridTextColumn Header="Total" 
-                                            Binding="{Binding VendingAmount, StringFormat='৳{0:N2}'}" 
-                                            Width="90">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="FontWeight" Value="Bold"/>
-                                    <Setter Property="Foreground" Value="#27ae60"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-                        
-                        <DataGridTextColumn Header="Trx ID" 
-                                            Binding="{Binding TransactionId}" 
-                                            Width="85"/>
-                        
-                        <DataGridTextColumn Header="Customer" 
-                                            Binding="{Binding CustomerName}" 
-                                            Width="*"
-                                            MinWidth="100"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </ScrollViewer>
+                    <DataGridTextColumn Header="Transaction ID" 
+                                        Binding="{Binding TransactionId}" 
+                                        Width="120">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="FontFamily" Value="Courier New"/>
+                                <Setter Property="FontSize" Value="12"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    
+                    <DataGridTextColumn Header="Meter Number" 
+                                        Binding="{Binding MeterNumber}" 
+                                        Width="120">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    
+                    <DataGridTextColumn Header="Seq" 
+                                        Binding="{Binding SequenceNumber}" 
+                                        Width="50">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    
+                    <DataGridTextColumn Header="Token" 
+                                        Binding="{Binding Token}" 
+                                        Width="180">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="FontFamily" Value="Courier New"/>
+                                <Setter Property="FontSize" Value="11"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    
+                    <DataGridTextColumn Header="Energy Cost" 
+                                        Binding="{Binding EnergyCost, StringFormat='৳{0:N2}'}" 
+                                        Width="100">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextAlignment" Value="Right"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    
+                    <DataGridTextColumn Header="Meter Rent" 
+                                        Binding="{Binding MeterRent, StringFormat='৳{0:N2}'}" 
+                                        Width="90">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextAlignment" Value="Right"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    
+                    <DataGridTextColumn Header="Demand Charge" 
+                                        Binding="{Binding DemandCharge, StringFormat='৳{0:N2}'}" 
+                                        Width="115">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextAlignment" Value="Right"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    
+                    <DataGridTextColumn Header="VAT" 
+                                        Binding="{Binding VAT, StringFormat='৳{0:N2}'}" 
+                                        Width="80">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextAlignment" Value="Right"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    
+                    <DataGridTextColumn Header="Rebate" 
+                                        Binding="{Binding Rebate, StringFormat='৳{0:N2}'}" 
+                                        Width="80">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextAlignment" Value="Right"/>
+                                <Setter Property="Foreground" Value="#e74c3c"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    
+                    <DataGridTextColumn Header="Arrear" 
+                                        Binding="{Binding ArrearAmount, StringFormat='৳{0:N2}'}" 
+                                        Width="90">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextAlignment" Value="Right"/>
+                                <Setter Property="Foreground" Value="#e67e22"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    
+                    <DataGridTextColumn Header="Vending Amount" 
+                                        Binding="{Binding VendingAmount, StringFormat='৳{0:N2}'}" 
+                                        Width="120">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="Foreground" Value="#27ae60"/>
+                                <Setter Property="FontSize" Value="14"/>
+                                <Setter Property="TextAlignment" Value="Right"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    
+                    <DataGridTextColumn Header="Amount" 
+                                        Binding="{Binding Amount, StringFormat='৳{0:N2}'}" 
+                                        Width="100">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                <Setter Property="TextAlignment" Value="Right"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    
+                    <DataGridTextColumn Header="Customer" 
+                                        Binding="{Binding CustomerName}" 
+                                        Width="150"/>
+                    
+                    <DataGridTextColumn Header="Notes" 
+                                        Binding="{Binding Notes}" 
+                                        Width="*"
+                                        MinWidth="150">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextWrapping" Value="NoWrap"/>
+                                <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
         </Border>
         
         <!-- Action Buttons -->
         <StackPanel Grid.Row="3" 
                     Orientation="Horizontal" 
                     HorizontalAlignment="Right"
-                    Margin="0,10,0,0">
-            <Button Content="🖨️ Print Selected" 
+                    Margin="0,0,0,10">
+            <Button Content="🖨️ Print" 
                     Command="{Binding PrintSelectedCommand}"
                     Style="{StaticResource PrimaryButtonStyle}"/>
-            <Button Content="🗑️ Delete Selected" 
+            <Button Content="🗑️ Delete" 
                     Command="{Binding DeleteSelectedCommand}"
                     Style="{StaticResource DangerButtonStyle}"/>
         </StackPanel>
+        
+        <!-- Selected Token Details Panel -->
+        <Border Grid.Row="4" 
+                Style="{StaticResource CardStyle}"
+                Visibility="{Binding SelectedPayment, Converter={StaticResource StringToVisibilityConverter}}">
+            <StackPanel>
+                <TextBlock Text="Token Details" 
+                           FontSize="16" 
+                           FontWeight="SemiBold"
+                           Margin="0,0,0,15"/>
+                
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Column 1 - Basic Info -->
+                    <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                        <TextBlock Text="Basic Information" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                        
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Meter:" Margin="0,4" FontWeight="SemiBold"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedPayment.MeterNumber}" Margin="10,4"/>
+                            
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Sequence:" Margin="0,4" FontWeight="SemiBold"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedPayment.SequenceNumber}" Margin="10,4"/>
+                            
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Trx ID:" Margin="0,4" FontWeight="SemiBold"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedPayment.TransactionId}" Margin="10,4"/>
+                            
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Date:" Margin="0,4" FontWeight="SemiBold"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedPayment.PaymentDate, StringFormat='dd/MM/yyyy HH:mm'}" Margin="10,4"/>
+                        </Grid>
+                    </StackPanel>
+                    
+                    <!-- Column 2 - Token -->
+                    <StackPanel Grid.Column="1" Margin="0,0,15,0">
+                        <TextBlock Text="Token Number" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                        <Border Background="#fff3cd" 
+                                BorderBrush="#ffc107" 
+                                BorderThickness="1" 
+                                Padding="10"
+                                CornerRadius="4">
+                            <TextBlock Text="{Binding SelectedPayment.Token}" 
+                                       FontFamily="Courier New"
+                                       FontSize="16"
+                                       FontWeight="Bold"
+                                       Foreground="#856404"
+                                       TextAlignment="Center"
+                                       TextWrapping="Wrap"/>
+                        </Border>
+                    </StackPanel>
+                    
+                    <!-- Column 3 - Cost Breakdown -->
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Cost Breakdown" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                        
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Energy Cost:" Margin="0,2"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedPayment.EnergyCost, StringFormat='৳{0:N2}'}" Margin="10,2" FontWeight="SemiBold"/>
+                            
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Meter Rent:" Margin="0,2"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedPayment.MeterRent, StringFormat='৳{0:N2}'}" Margin="10,2"/>
+                            
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Demand Charge:" Margin="0,2"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedPayment.DemandCharge, StringFormat='৳{0:N2}'}" Margin="10,2"/>
+                            
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="VAT:" Margin="0,2"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedPayment.VAT, StringFormat='৳{0:N2}'}" Margin="10,2"/>
+                            
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Rebate:" Margin="0,2"/>
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SelectedPayment.Rebate, StringFormat='৳{0:N2}'}" Margin="10,2" Foreground="#e74c3c"/>
+                            
+                            <Border Grid.Row="5" Grid.ColumnSpan="2" 
+                                    Background="#d4edda" 
+                                    BorderBrush="#28a745" 
+                                    BorderThickness="0,2,0,0" 
+                                    Margin="0,8,0,0"
+                                    Padding="0,8,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Total:" FontWeight="Bold" FontSize="14"/>
+                                    <TextBlock Grid.Column="1" 
+                                               Text="{Binding SelectedPayment.VendingAmount, StringFormat='৳{0:N2}'}" 
+                                               FontWeight="Bold" 
+                                               FontSize="16"
+                                               Foreground="#155724"/>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Border>
     </Grid>
 </UserControl>

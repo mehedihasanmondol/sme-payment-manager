@@ -8,4 +8,5 @@ namespace BillPaymentManager.Services.Interfaces;
 public interface IPrintService
 {
     void PrintReceipt(Payment payment);
+    void ShowPrintPreview(Payment payment);
 }

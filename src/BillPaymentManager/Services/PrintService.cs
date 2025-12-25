@@ -2,6 +2,7 @@ using System.Drawing;
 using System.Drawing.Printing;
 using BillPaymentManager.Models;
 using BillPaymentManager.Services.Interfaces;
+using BillPaymentManager.Views;
 
 namespace BillPaymentManager.Services;
 
@@ -10,18 +11,16 @@ namespace BillPaymentManager.Services;
 /// </summary>
 public class PrintService : IPrintService
 {
-    private Payment? _currentPayment;
-    private Font _titleFont = new Font("Arial", 16, FontStyle.Bold);
-    private Font _headerFont = new Font("Arial", 12, FontStyle.Bold);
-    private Font _normalFont = new Font("Arial", 10);
-    private Font _tokenFont = new Font("Courier New", 12, FontStyle.Bold);
-
+    public void ShowPrintPreview(Payment payment)
+    {
+        var previewWindow = new PrintPreviewWindow(payment);
+        previewWindow.ShowDialog();
+    }
+    
     public void PrintReceipt(Payment payment)
     {
-        _currentPayment = payment;
-
         PrintDocument printDoc = new PrintDocument();
-        printDoc.PrintPage += new PrintPageEventHandler(PrintPage);
+        printDoc.PrintPage += (sender, e) => PrintPage(payment, e);
 
         try
         {
@@ -38,97 +37,98 @@ public class PrintService : IPrintService
         }
     }
 
-    private void PrintPage(object sender, PrintPageEventArgs e)
+    private void PrintPage(Payment payment, PrintPageEventArgs e)
     {
-        if (_currentPayment == null || e.Graphics == null)
-            return;
-
-        float yPos = 50;
+        if (e.Graphics == null) return;
+        
+        float yPos = 30;
         float leftMargin = 50;
-        string receiptText = GenerateReceiptText(_currentPayment);
-
-        // Title
-        e.Graphics.DrawString("ELECTRICITY TOKEN RECEIPT", _titleFont, Brushes.Black, leftMargin, yPos);
-        yPos += 40;
-
-        // Separator Line
-        e.Graphics.DrawLine(Pens.Black, leftMargin, yPos, leftMargin + 400, yPos);
-        yPos += 20;
-
-        // Receipt Details
-        string[] lines = receiptText.Split('\n');
-        foreach (string line in lines)
+        float centerX = e.PageBounds.Width / 2;
+        
+        // Fonts
+        var titleFont = new Font("Arial", 16, FontStyle.Bold);
+        var headerFont = new Font("Arial", 12, FontStyle.Bold);
+        var normalFont = new Font("Arial", 10);
+        var smallFont = new Font("Arial", 9);
+        var tokenFont = new Font("Courier New", 14, FontStyle.Bold);
+        
+        // Helper function for centered text
+        void DrawCenteredText(string text, Font font, Brush brush, ref float y, float spacing = 20)
         {
-            if (line.StartsWith("===="))
-            {
-                e.Graphics.DrawLine(Pens.Black, leftMargin, yPos, leftMargin + 400, yPos);
-                yPos += 15;
-            }
-            else if (line.StartsWith("TOKEN:"))
-            {
-                e.Graphics.DrawString(line, _tokenFont, Brushes.DarkBlue, leftMargin, yPos);
-                yPos += 30;
-            }
-            else if (line.StartsWith("METER") || line.StartsWith("VENDING"))
-            {
-                e.Graphics.DrawString(line, _headerFont, Brushes.Black, leftMargin, yPos);
-                yPos += 25;
-            }
-            else
-            {
-                e.Graphics.DrawString(line, _normalFont, Brushes.Black, leftMargin, yPos);
-                yPos += 20;
-            }
+            var size = e.Graphics.MeasureString(text, font);
+            e.Graphics.DrawString(text, font, brush, centerX - (size.Width / 2), y);
+            y += spacing;
         }
-
+        
+        // Helper function for line
+        void DrawLine(ref float y, float margin = 30)
+        {
+            e.Graphics.DrawLine(Pens.Black, leftMargin, y, e.PageBounds.Width - leftMargin, y);
+            y += margin;
+        }
+        
+        // Header
+        DrawCenteredText("তাসকিন ডিজিটাল স্টুডিও", titleFont, Brushes.Black, ref yPos, 25);
+        DrawCenteredText("মেহেরী বাজার, ডিভ অফিসের নিচে", normalFont, Brushes.Black, ref yPos, 18);
+        DrawCenteredText("মোবাইল: ০১৮১৫৫৫৫৫৯৮", normalFont, Brushes.Black, ref yPos, 18);
+        DrawCenteredText("প্রোঃ মোঃ মাহাবুব", normalFont, Brushes.Black, ref yPos, 18);
+        DrawCenteredText("রূপসা, রূপগঞ্জ, নারায়ণগঞ্জ", smallFont, Brushes.Black, ref yPos, 18);
+        DrawCenteredText($"তারিখ: {payment.PaymentDate:dd-MM-yyyy hh:mm:ss tt}", smallFont, Brushes.Black, ref yPos, 15);
+        
+        DrawLine(ref yPos, 10);
+        
+        // Main Title
+        DrawCenteredText("পল্লী বিদ্যুৎ প্রিপেইড রশিদ", headerFont, Brushes.Black, ref yPos, 15);
+        
+        DrawLine(ref yPos, 15);
+        
+        // Details Section
+        var detailsLeftMargin = leftMargin + 10;
+        var detailsRightMargin = e.PageBounds.Width - leftMargin - 10;
+        
+        void DrawDetail(string label, string value, ref float y)
+        {
+            e.Graphics.DrawString(label, normalFont, Brushes.Black, detailsLeftMargin, y);
+            var valueSize = e.Graphics.MeasureString($": {value}", normalFont);
+            e.Graphics.DrawString($": {value}", normalFont, Brushes.Black, 
+                detailsRightMargin - valueSize.Width, y);
+            y += 20;
+        }
+        
+        DrawDetail("মিটার নম্বর", payment.MeterNumber ?? "N/A", ref yPos);
+        DrawDetail("গ্রাহক নাম", payment.CustomerName ?? "N/A", ref yPos);
+        DrawDetail("সিকুয়েন্স নম্বর", payment.SequenceNumber?.ToString() ?? "N/A", ref yPos);
+        
+        yPos += 5;
+        DrawLine(ref yPos, 15);
+        
+        // Cost Breakdown
+        DrawDetail("Energy Cost", $"{payment.EnergyCost:N2}", ref yPos);
+        DrawDetail("Demand Charge", $"{payment.DemandCharge:N2}", ref yPos);
+        DrawDetail("Meter Rent", $"{payment.MeterRent:N2}", ref yPos);
+        DrawDetail("VAT", $"{payment.VAT:N2}", ref yPos);
+        DrawDetail("Rebate", $"{payment.Rebate:N2}", ref yPos);
+        DrawDetail("Transaction ID", payment.TransactionId ?? "(Not Provided)", ref yPos);
+        
+        yPos += 5;
+        
+        // Total Amount
+        e.Graphics.DrawString("মোট পরিমাণ", headerFont, Brushes.Black, detailsLeftMargin, yPos);
+        var totalSize = e.Graphics.MeasureString($": {payment.VendingAmount:N2}", headerFont);
+        e.Graphics.DrawString($": {payment.VendingAmount:N2}", headerFont, Brushes.Black, 
+            detailsRightMargin - totalSize.Width, yPos);
+        yPos += 30;
+        
+        DrawLine(ref yPos, 15);
+        
+        // Token Section
+        DrawCenteredText("Token", headerFont, Brushes.Black, ref yPos, 10);
+        DrawCenteredText(payment.Token ?? "N/A", tokenFont, Brushes.Black, ref yPos, 15);
+        
+        DrawLine(ref yPos, 15);
+        
         // Footer
-        yPos += 20;
-        e.Graphics.DrawString($"Printed: {DateTime.Now:dd/MM/yyyy HH:mm}", _normalFont, Brushes.Gray, leftMargin, yPos);
-    }
-
-    private string GenerateReceiptText(Payment payment)
-    {
-        var sb = new System.Text.StringBuilder();
-
-        sb.AppendLine($"Date: {payment.PaymentDate:dd/MM/yyyy HH:mm}");
-        sb.AppendLine($"Transaction ID: {payment.TransactionId ?? "N/A"}");
-        sb.AppendLine("=====================================");
-        
-        sb.AppendLine($"METER NUMBER: {payment.MeterNumber ?? "N/A"}");
-        sb.AppendLine($"Sequence: {payment.SequenceNumber?.ToString() ?? "N/A"}");
-        sb.AppendLine("");
-        
-        sb.AppendLine($"TOKEN: {payment.Token ?? "N/A"}");
-        sb.AppendLine("=====================================");
-        sb.AppendLine("");
-        
-        sb.AppendLine("COST BREAKDOWN:");
-        sb.AppendLine($"  Energy Cost:      ৳{payment.EnergyCost:N2}");
-        sb.AppendLine($"  Meter Rent:       ৳{payment.MeterRent:N2}");
-        sb.AppendLine($"  Demand Charge:    ৳{payment.DemandCharge:N2}");
-        sb.AppendLine($"  VAT:              ৳{payment.VAT:N2}");
-        sb.AppendLine($"  Rebate:           ৳{payment.Rebate:N2}");
-        
-        if (payment.ArrearAmount.HasValue && payment.ArrearAmount.Value > 0)
-        {
-            sb.AppendLine($"  Arrear:           ৳{payment.ArrearAmount:N2}");
-        }
-        
-        sb.AppendLine("=====================================");
-        sb.AppendLine($"VENDING AMOUNT:     ৳{payment.VendingAmount:N2}");
-        sb.AppendLine("=====================================");
-        
-        if (!string.IsNullOrWhiteSpace(payment.CustomerName))
-        {
-            sb.AppendLine("");
-            sb.AppendLine($"Customer: {payment.CustomerName}");
-        }
-        
-        if (!string.IsNullOrWhiteSpace(payment.Notes))
-        {
-            sb.AppendLine($"Notes: {payment.Notes}");
-        }
-
-        return sb.ToString();
+        DrawCenteredText("ধন্যবাদ, তাসকিন ডিজিটাল স্টুডিও।", normalFont, Brushes.Black, ref yPos, 15);
+        DrawCenteredText("Developed by: Abu Kahar Siddiq", smallFont, Brushes.Gray, ref yPos, 10);
     }
 }

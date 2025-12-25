@@ -1,0 +1,57 @@
+﻿<Window x:Class="BillPaymentManager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:BillPaymentManager.Views"
+        xmlns:vm="clr-namespace:BillPaymentManager.ViewModels"
+        mc:Ignorable="d"
+        Title="{Binding Title}" 
+        Height="700" Width="1200"
+        WindowStartupLocation="CenterScreen">
+    
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+            <views:DashboardView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:AddPaymentViewModel}">
+            <views:AddPaymentView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:HistoryViewModel}">
+            <views:HistoryView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+            <views:SettingsView/>
+        </DataTemplate>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Navigation Menu -->
+        <Border Grid.Row="0" Background="#2C3E50" Padding="10">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="📊 Dashboard" 
+                        Command="{Binding NavigateToDashboardCommand}"
+                        Style="{StaticResource NavButtonStyle}"/>
+                <Button Content="➕ Add Payment" 
+                        Command="{Binding NavigateToAddPaymentCommand}"
+                        Style="{StaticResource NavButtonStyle}"/>
+                <Button Content="📜 History" 
+                        Command="{Binding NavigateToHistoryCommand}"
+                        Style="{StaticResource NavButtonStyle}"/>
+                <Button Content="⚙️ Settings" 
+                        Command="{Binding NavigateToSettingsCommand}"
+                        Style="{StaticResource NavButtonStyle}"/>
+            </StackPanel>
+        </Border>
+        
+        <!-- Content Area -->
+        <ContentControl Grid.Row="1" 
+                       Content="{Binding CurrentViewModel}"
+                       Margin="10"/>
+    </Grid>
+</Window>

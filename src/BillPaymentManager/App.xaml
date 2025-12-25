@@ -5,14 +5,13 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Resources/Styles/AppStyles.xaml"/>
+                <ResourceDictionary Source="Resources/Styles/AppStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             
-            <!-- Converters -->
+            <!-- Value Converters -->
             <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-            <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
             <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
-            <converters:ProviderToStringConverter x:Key="ProviderToStringConverter"/>
+            <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

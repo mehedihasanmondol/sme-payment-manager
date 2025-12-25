@@ -13,20 +13,10 @@ public class PaymentStatistics
     public int TodayCount { get; set; }
     public int ThisMonthCount { get; set; }
     
-    // Mobile Payment Breakdown
-    public decimal BKashAmount { get; set; }
-    public decimal NagadAmount { get; set; }
-    public decimal RocketAmount { get; set; }
-    public decimal OtherAmount { get; set; }
-    
-    // By Type
-    public int MobilePaymentCount { get; set; }
-    public decimal MobilePaymentAmount { get; set; }
-    public int ElectricityTokenCount { get; set; }
-    public decimal ElectricityTokenAmount { get; set; }
-    
-    // Electricity Specific
+    // Electricity Token Specific
     public decimal TotalEnergyCost { get; set; }
     public decimal TotalMeterRent { get; set; }
     public decimal TotalDemandCharge { get; set; }
+    public decimal TotalVAT { get; set; }
+    public decimal TotalRebate { get; set; }
 }

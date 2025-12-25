@@ -141,10 +141,10 @@ C:\Users\Love Station\Documents\sme-payment-manager\tests\BillPaymentManager.Tes
 C:\Users\Love Station\Documents\sme-payment-manager\tests\BillPaymentManager.Tests\obj\Debug\net8.0-windows\BillPaymentManager.Tests.AssemblyInfoInputs.cache
 C:\Users\Love Station\Documents\sme-payment-manager\tests\BillPaymentManager.Tests\obj\Debug\net8.0-windows\BillPaymentManager.Tests.AssemblyInfo.cs
 C:\Users\Love Station\Documents\sme-payment-manager\tests\BillPaymentManager.Tests\obj\Debug\net8.0-windows\BillPaymentManager.Tests.csproj.CoreCompileInputs.cache
+C:\Users\Love Station\Documents\sme-payment-manager\tests\BillPaymentManager.Tests\obj\Debug\net8.0-windows\BillPaymentManager.Tests.sourcelink.json
 C:\Users\Love Station\Documents\sme-payment-manager\tests\BillPaymentManager.Tests\obj\Debug\net8.0-windows\BillPaym.4D4B62DB.Up2Date
 C:\Users\Love Station\Documents\sme-payment-manager\tests\BillPaymentManager.Tests\obj\Debug\net8.0-windows\BillPaymentManager.Tests.dll
 C:\Users\Love Station\Documents\sme-payment-manager\tests\BillPaymentManager.Tests\obj\Debug\net8.0-windows\refint\BillPaymentManager.Tests.dll
 C:\Users\Love Station\Documents\sme-payment-manager\tests\BillPaymentManager.Tests\obj\Debug\net8.0-windows\BillPaymentManager.Tests.pdb
 C:\Users\Love Station\Documents\sme-payment-manager\tests\BillPaymentManager.Tests\obj\Debug\net8.0-windows\BillPaymentManager.Tests.genruntimeconfig.cache
 C:\Users\Love Station\Documents\sme-payment-manager\tests\BillPaymentManager.Tests\obj\Debug\net8.0-windows\ref\BillPaymentManager.Tests.dll
-C:\Users\Love Station\Documents\sme-payment-manager\tests\BillPaymentManager.Tests\obj\Debug\net8.0-windows\BillPaymentManager.Tests.sourcelink.json

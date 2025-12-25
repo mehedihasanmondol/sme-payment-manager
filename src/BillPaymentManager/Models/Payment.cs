@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace BillPaymentManager.Models;
 
 /// <summary>
-/// Payment record entity - supports both mobile payments and electricity tokens
+/// Electricity token purchase record
 /// </summary>
 public class Payment
 {
@@ -11,20 +11,7 @@ public class Payment
     public int Id { get; set; }
 
     [Required]
-    public PaymentType Type { get; set; }
-
-    [Required]
     public decimal Amount { get; set; }
-
-    // Mobile Payment Fields
-    [Required]
-    public PaymentProvider Provider { get; set; }
-
-    [MaxLength(100)]
-    public string? TransactionId { get; set; }
-
-    [MaxLength(20)]
-    public string? PhoneNumber { get; set; }
 
     // Electricity Token Fields
     [MaxLength(50)]
@@ -50,6 +37,9 @@ public class Payment
     public decimal? VendingAmount { get; set; }
 
     // Common Fields
+    [MaxLength(100)]
+    public string? TransactionId { get; set; }
+
     public DateTime PaymentDate { get; set; }
 
     public DateTime CreatedAt { get; set; }

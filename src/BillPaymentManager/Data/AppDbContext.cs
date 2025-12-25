@@ -5,25 +5,17 @@ using System.IO;
 namespace BillPaymentManager.Data;
 
 /// <summary>
-/// Application database context using SQLite
+/// Database context for the Bill Payment Manager
 /// </summary>
 public class AppDbContext : DbContext
 {
     public DbSet<Payment> Payments { get; set; } = null!;
 
-    public AppDbContext()
-    {
-    }
-
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-    {
-    }
-
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)
         {
-            // Database path: AppData\Local\BillPaymentManager\payments.db
+            // Get the database path
             var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             var dbFolder = Path.Combine(appDataPath, "BillPaymentManager");
             
@@ -34,6 +26,7 @@ public class AppDbContext : DbContext
             }
 
             var dbPath = Path.Combine(dbFolder, "payments.db");
+            
             optionsBuilder.UseSqlite($"Data Source={dbPath}");
         }
     }
@@ -43,8 +36,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Payment>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Amount).HasColumnType("decimal(18,2)");
-            entity.Property(e => e.Provider).HasConversion<string>();
+            entity.HasIndex(e => e.MeterNumber);
             entity.HasIndex(e => e.TransactionId);
             entity.HasIndex(e => e.PaymentDate);
         });

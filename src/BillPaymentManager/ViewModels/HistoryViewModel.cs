@@ -10,7 +10,7 @@ using BillPaymentManager.ViewModels.Base;
 namespace BillPaymentManager.ViewModels;
 
 /// <summary>
-/// ViewModel for payment history with filtering capabilities
+/// ViewModel for electricity token history with filtering capabilities
 /// </summary>
 public partial class HistoryViewModel : ViewModelBase
 {
@@ -30,22 +30,10 @@ public partial class HistoryViewModel : ViewModelBase
     private DateTime? _endDate;
 
     [ObservableProperty]
-    private PaymentProvider? _filterProvider;
-
-    [ObservableProperty]
     private bool _isLoading;
 
     [ObservableProperty]
     private string _searchText = string.Empty;
-
-    public List<PaymentProvider?> ProviderOptions { get; } = new()
-    {
-        null, // All
-        PaymentProvider.bKash,
-        PaymentProvider.Nagad,
-        PaymentProvider.Rocket,
-        PaymentProvider.Other
-    };
 
     public HistoryViewModel()
     {
@@ -65,11 +53,7 @@ public partial class HistoryViewModel : ViewModelBase
         {
             List<Payment> payments;
 
-            if (FilterProvider.HasValue)
-            {
-                payments = await _databaseService.GetPaymentsByProviderAsync(FilterProvider.Value);
-            }
-            else if (StartDate.HasValue && EndDate.HasValue)
+            if (StartDate.HasValue && EndDate.HasValue)
             {
                 payments = await _databaseService.GetPaymentsByDateRangeAsync(StartDate.Value, EndDate.Value);
             }
@@ -83,7 +67,8 @@ public partial class HistoryViewModel : ViewModelBase
             {
                 payments = payments.Where(p =>
                     (p.TransactionId?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                    (p.PhoneNumber?.Contains(SearchText) ?? false) ||
+                    (p.MeterNumber?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    (p.Token?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
                     (p.CustomerName?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false)
                 ).ToList();
             }
@@ -111,7 +96,6 @@ public partial class HistoryViewModel : ViewModelBase
     {
         StartDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
         EndDate = DateTime.Now;
-        FilterProvider = null;
         SearchText = string.Empty;
         LoadDataCommand.Execute(null);
     }
@@ -133,7 +117,7 @@ public partial class HistoryViewModel : ViewModelBase
             return;
 
         var result = MessageBox.Show(
-            $"Are you sure you want to delete this payment?\n\nTransaction ID: {SelectedPayment.TransactionId}\nAmount: ৳{SelectedPayment.Amount:N2}",
+            $"Are you sure you want to delete this token?\n\nMeter: {SelectedPayment.MeterNumber}\nToken: {SelectedPayment.Token}\nAmount: ৳{SelectedPayment.Amount:N2}",
             "Confirm Delete",
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
@@ -143,12 +127,12 @@ public partial class HistoryViewModel : ViewModelBase
             var success = await _databaseService.DeletePaymentAsync(SelectedPayment.Id);
             if (success)
             {
-                MessageBox.Show("Payment deleted successfully", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Token deleted successfully", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 await LoadData();
             }
             else
             {
-                MessageBox.Show("Failed to delete payment", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Failed to delete token", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

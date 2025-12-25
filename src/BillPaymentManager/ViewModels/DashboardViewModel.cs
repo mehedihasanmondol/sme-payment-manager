@@ -8,7 +8,7 @@ using BillPaymentManager.ViewModels.Base;
 namespace BillPaymentManager.ViewModels;
 
 /// <summary>
-/// Dashboard ViewModel for displaying payment statistics
+/// Dashboard ViewModel for displaying electricity token statistics
 /// </summary>
 public partial class DashboardViewModel : ViewModelBase
 {
@@ -33,34 +33,9 @@ public partial class DashboardViewModel : ViewModelBase
     private int _thisMonthCount;
 
     [ObservableProperty]
-    private decimal _bKashAmount;
-
-    [ObservableProperty]
-    private decimal _nagadAmount;
-
-    [ObservableProperty]
-    private decimal _rocketAmount;
-
-    [ObservableProperty]
-    private decimal _otherAmount;
-
-    [ObservableProperty]
     private bool _isLoading;
     
-    // Mobile Payment Stats
-    [ObservableProperty]
-    private int _mobilePaymentCount;
-    
-    [ObservableProperty]
-    private decimal _mobilePaymentAmount;
-    
     // Electricity Token Stats
-    [ObservableProperty]
-    private int _electricityTokenCount;
-    
-    [ObservableProperty]
-    private decimal _electricityTokenAmount;
-    
     [ObservableProperty]
     private decimal _totalEnergyCost;
     
@@ -69,6 +44,12 @@ public partial class DashboardViewModel : ViewModelBase
     
     [ObservableProperty]
     private decimal _totalDemandCharge;
+    
+    [ObservableProperty]
+    private decimal _totalVAT;
+    
+    [ObservableProperty]
+    private decimal _totalRebate;
 
     public DashboardViewModel()
     {
@@ -90,21 +71,13 @@ public partial class DashboardViewModel : ViewModelBase
             TotalCount = stats.TotalCount;
             TodayCount = stats.TodayCount;
             ThisMonthCount = stats.ThisMonthCount;
-            BKashAmount = stats.BKashAmount;
-            NagadAmount = stats.NagadAmount;
-            RocketAmount = stats.RocketAmount;
-            OtherAmount = stats.OtherAmount;
-            
-            // Type-specific stats
-            MobilePaymentCount = stats.MobilePaymentCount;
-            MobilePaymentAmount = stats.MobilePaymentAmount;
-            ElectricityTokenCount = stats.ElectricityTokenCount;
-            ElectricityTokenAmount = stats.ElectricityTokenAmount;
             
             // Electricity-specific
             TotalEnergyCost = stats.TotalEnergyCost;
             TotalMeterRent = stats.TotalMeterRent;
             TotalDemandCharge = stats.TotalDemandCharge;
+            TotalVAT = stats.TotalVAT;
+            TotalRebate = stats.TotalRebate;
         }
         finally
         {

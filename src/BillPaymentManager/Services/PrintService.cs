@@ -1,128 +1,134 @@
 using System.Drawing;
 using System.Drawing.Printing;
-using System.Text;
 using BillPaymentManager.Models;
 using BillPaymentManager.Services.Interfaces;
 
 namespace BillPaymentManager.Services;
 
 /// <summary>
-/// Print service for generating and printing payment receipts
+/// Print service for generating electricity token receipts
 /// </summary>
 public class PrintService : IPrintService
 {
     private Payment? _currentPayment;
-    private readonly Font _titleFont = new("Arial", 14, FontStyle.Bold);
-    private readonly Font _normalFont = new("Arial", 10);
-    private readonly Font _boldFont = new("Arial", 10, FontStyle.Bold);
+    private Font _titleFont = new Font("Arial", 16, FontStyle.Bold);
+    private Font _headerFont = new Font("Arial", 12, FontStyle.Bold);
+    private Font _normalFont = new Font("Arial", 10);
+    private Font _tokenFont = new Font("Courier New", 12, FontStyle.Bold);
 
-    public bool PrintReceipt(Payment payment)
+    public void PrintReceipt(Payment payment)
     {
+        _currentPayment = payment;
+
+        PrintDocument printDoc = new PrintDocument();
+        printDoc.PrintPage += new PrintPageEventHandler(PrintPage);
+
         try
         {
-            _currentPayment = payment;
-            var printDocument = new PrintDocument();
-            printDocument.PrintPage += PrintDocument_PrintPage;
-            printDocument.Print();
-            return true;
+            printDoc.Print();
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Print error: {ex.Message}");
-            return false;
+            System.Windows.MessageBox.Show(
+                $"Print failed: {ex.Message}",
+                "Print Error",
+                System.Windows.MessageBoxButton.OK,
+                System.Windows.MessageBoxImage.Error);
         }
     }
 
-    public bool PrintMultipleReceipts(List<Payment> payments)
-    {
-        foreach (var payment in payments)
-        {
-            if (!PrintReceipt(payment))
-                return false;
-        }
-        return true;
-    }
-
-    public string GenerateReceiptText(Payment payment)
-    {
-        var sb = new StringBuilder();
-        sb.AppendLine("========================================");
-        sb.AppendLine("         PAYMENT RECEIPT");
-        sb.AppendLine("========================================");
-        sb.AppendLine();
-        sb.AppendLine($"Transaction ID: {payment.TransactionId}");
-        sb.AppendLine($"Provider:       {payment.Provider}");
-        sb.AppendLine($"Amount:         ৳{payment.Amount:N2}");
-        sb.AppendLine($"Phone:          {payment.PhoneNumber}");
-        sb.AppendLine($"Date:           {payment.PaymentDate:dd/MM/yyyy hh:mm tt}");
-        
-        if (!string.IsNullOrEmpty(payment.CustomerName))
-            sb.AppendLine($"Customer:       {payment.CustomerName}");
-        
-        if (!string.IsNullOrEmpty(payment.Notes))
-        {
-            sb.AppendLine();
-            sb.AppendLine($"Notes: {payment.Notes}");
-        }
-        
-        sb.AppendLine();
-        sb.AppendLine("========================================");
-        sb.AppendLine("        Thank you for your payment!");
-        sb.AppendLine("========================================");
-        
-        return sb.ToString();
-    }
-
-    private void PrintDocument_PrintPage(object sender, PrintPageEventArgs e)
+    private void PrintPage(object sender, PrintPageEventArgs e)
     {
         if (_currentPayment == null || e.Graphics == null)
             return;
 
-        float yPosition = 50;
+        float yPos = 50;
         float leftMargin = 50;
+        string receiptText = GenerateReceiptText(_currentPayment);
 
         // Title
-        e.Graphics.DrawString("PAYMENT RECEIPT", _titleFont, Brushes.Black, leftMargin, yPosition);
-        yPosition += 40;
+        e.Graphics.DrawString("ELECTRICITY TOKEN RECEIPT", _titleFont, Brushes.Black, leftMargin, yPos);
+        yPos += 40;
 
-        // Draw line
-        e.Graphics.DrawLine(Pens.Black, leftMargin, yPosition, 300, yPosition);
-        yPosition += 20;
+        // Separator Line
+        e.Graphics.DrawLine(Pens.Black, leftMargin, yPos, leftMargin + 400, yPos);
+        yPos += 20;
 
-        // Payment details
-        e.Graphics.DrawString("Transaction ID:", _boldFont, Brushes.Black, leftMargin, yPosition);
-        e.Graphics.DrawString(_currentPayment.TransactionId ?? "N/A", _normalFont, Brushes.Black, leftMargin + 120, yPosition);
-        yPosition += 25;
-
-        e.Graphics.DrawString("Provider:", _boldFont, Brushes.Black, leftMargin, yPosition);
-        e.Graphics.DrawString(_currentPayment.Provider.ToString(), _normalFont, Brushes.Black, leftMargin + 120, yPosition);
-        yPosition += 25;
-
-        e.Graphics.DrawString("Amount:", _boldFont, Brushes.Black, leftMargin, yPosition);
-        e.Graphics.DrawString($"৳{_currentPayment.Amount:N2}", _titleFont, Brushes.Black, leftMargin + 120, yPosition);
-        yPosition += 30;
-
-        e.Graphics.DrawString("Phone:", _boldFont, Brushes.Black, leftMargin, yPosition);
-        e.Graphics.DrawString(_currentPayment.PhoneNumber ?? "N/A", _normalFont, Brushes.Black, leftMargin + 120, yPosition);
-        yPosition += 25;
-
-        e.Graphics.DrawString("Date:", _boldFont, Brushes.Black, leftMargin, yPosition);
-        e.Graphics.DrawString(_currentPayment.PaymentDate.ToString("dd/MM/yyyy hh:mm tt"), _normalFont, Brushes.Black, leftMargin + 120, yPosition);
-        yPosition += 30;
-
-        if (!string.IsNullOrEmpty(_currentPayment.CustomerName))
+        // Receipt Details
+        string[] lines = receiptText.Split('\n');
+        foreach (string line in lines)
         {
-            e.Graphics.DrawString("Customer:", _boldFont, Brushes.Black, leftMargin, yPosition);
-            e.Graphics.DrawString(_currentPayment.CustomerName, _normalFont, Brushes.Black, leftMargin + 120, yPosition);
-            yPosition += 25;
+            if (line.StartsWith("===="))
+            {
+                e.Graphics.DrawLine(Pens.Black, leftMargin, yPos, leftMargin + 400, yPos);
+                yPos += 15;
+            }
+            else if (line.StartsWith("TOKEN:"))
+            {
+                e.Graphics.DrawString(line, _tokenFont, Brushes.DarkBlue, leftMargin, yPos);
+                yPos += 30;
+            }
+            else if (line.StartsWith("METER") || line.StartsWith("VENDING"))
+            {
+                e.Graphics.DrawString(line, _headerFont, Brushes.Black, leftMargin, yPos);
+                yPos += 25;
+            }
+            else
+            {
+                e.Graphics.DrawString(line, _normalFont, Brushes.Black, leftMargin, yPos);
+                yPos += 20;
+            }
         }
 
-        // Draw line
-        yPosition += 10;
-        e.Graphics.DrawLine(Pens.Black, leftMargin, yPosition, 300, yPosition);
-        yPosition += 20;
+        // Footer
+        yPos += 20;
+        e.Graphics.DrawString($"Printed: {DateTime.Now:dd/MM/yyyy HH:mm}", _normalFont, Brushes.Gray, leftMargin, yPos);
+    }
 
-        // Thank you message
-        e.Graphics.DrawString("Thank you for your payment!", _normalFont, Brushes.Black, leftMargin, yPosition);
+    private string GenerateReceiptText(Payment payment)
+    {
+        var sb = new System.Text.StringBuilder();
+
+        sb.AppendLine($"Date: {payment.PaymentDate:dd/MM/yyyy HH:mm}");
+        sb.AppendLine($"Transaction ID: {payment.TransactionId ?? "N/A"}");
+        sb.AppendLine("=====================================");
+        
+        sb.AppendLine($"METER NUMBER: {payment.MeterNumber ?? "N/A"}");
+        sb.AppendLine($"Sequence: {payment.SequenceNumber?.ToString() ?? "N/A"}");
+        sb.AppendLine("");
+        
+        sb.AppendLine($"TOKEN: {payment.Token ?? "N/A"}");
+        sb.AppendLine("=====================================");
+        sb.AppendLine("");
+        
+        sb.AppendLine("COST BREAKDOWN:");
+        sb.AppendLine($"  Energy Cost:      ৳{payment.EnergyCost:N2}");
+        sb.AppendLine($"  Meter Rent:       ৳{payment.MeterRent:N2}");
+        sb.AppendLine($"  Demand Charge:    ৳{payment.DemandCharge:N2}");
+        sb.AppendLine($"  VAT:              ৳{payment.VAT:N2}");
+        sb.AppendLine($"  Rebate:           ৳{payment.Rebate:N2}");
+        
+        if (payment.ArrearAmount.HasValue && payment.ArrearAmount.Value > 0)
+        {
+            sb.AppendLine($"  Arrear:           ৳{payment.ArrearAmount:N2}");
+        }
+        
+        sb.AppendLine("=====================================");
+        sb.AppendLine($"VENDING AMOUNT:     ৳{payment.VendingAmount:N2}");
+        sb.AppendLine("=====================================");
+        
+        if (!string.IsNullOrWhiteSpace(payment.CustomerName))
+        {
+            sb.AppendLine("");
+            sb.AppendLine($"Customer: {payment.CustomerName}");
+        }
+        
+        if (!string.IsNullOrWhiteSpace(payment.Notes))
+        {
+            sb.AppendLine($"Notes: {payment.Notes}");
+        }
+
+        return sb.ToString();
     }
 }

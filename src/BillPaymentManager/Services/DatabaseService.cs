@@ -30,16 +30,10 @@ public class DatabaseService : IDatabaseService
             
             if (created)
             {
-                System.Diagnostics.Debug.WriteLine("Database created successfully via EnsureCreated");
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("Database already exists - checking for schema updates");
-                // Database exists, check if we need to add new columns
-                MigrateSchemaIfNeeded();
+                System.Diagnostics.Debug.WriteLine("Database created successfully");
             }
             
-            // Verify the Payments table exists by trying to query it
+            // Verify the Payments table exists
             try
             {
                 var testQuery = _context.Payments.Take(1).ToList();
@@ -50,7 +44,7 @@ public class DatabaseService : IDatabaseService
                 // Table doesn't exist, create it manually
                 System.Diagnostics.Debug.WriteLine("Payments table not found, creating manually...");
                 CreatePaymentsTableManually();
-                System.Diagnostics.Debug.WriteLine("Payments table created manually");
+                System.Diagnostics.Debug.WriteLine("Payments table created successfully");
             }
             
             // Final verification
@@ -59,7 +53,7 @@ public class DatabaseService : IDatabaseService
                 throw new Exception("Cannot connect to database");
             }
             
-            System.Diagnostics.Debug.WriteLine("Database initialized and verified successfully");
+            System.Diagnostics.Debug.WriteLine("Database initialized successfully");
         }
         catch (Exception ex)
         {
@@ -78,74 +72,12 @@ public class DatabaseService : IDatabaseService
         }
     }
     
-    private void MigrateSchemaIfNeeded()
-    {
-        try
-        {
-            // Check if Type column exists (new column for payment type)
-            var checkColumnSql = "SELECT COUNT(*) FROM pragma_table_info('Payments') WHERE name='Type'";
-            var typeColumnExists = _context.Database.ExecuteSqlRaw(checkColumnSql);
-            
-            if (typeColumnExists == 0)
-            {
-                System.Diagnostics.Debug.WriteLine("Adding new columns for electricity token support...");
-                
-                // Add all new columns
-                var alterTableSql = @"
-                    ALTER TABLE Payments ADD COLUMN Type TEXT NOT NULL DEFAULT 'MobilePayment';
-                    ALTER TABLE Payments ADD COLUMN MeterNumber TEXT;
-                    ALTER TABLE Payments ADD COLUMN Token TEXT;
-                    ALTER TABLE Payments ADD COLUMN SequenceNumber INTEGER;
-                    ALTER TABLE Payments ADD COLUMN EnergyCost REAL;
-                    ALTER TABLE Payments ADD COLUMN MeterRent REAL;
-                    ALTER TABLE Payments ADD COLUMN DemandCharge REAL;
-                    ALTER TABLE Payments ADD COLUMN VAT REAL;
-                    ALTER TABLE Payments ADD COLUMN Rebate REAL;
-                    ALTER TABLE Payments ADD COLUMN ArrearAmount REAL;
-                    ALTER TABLE Payments ADD COLUMN VendingAmount REAL;
-                    CREATE INDEX IF NOT EXISTS IX_Payments_Type ON Payments (Type);
-                    CREATE INDEX IF NOT EXISTS IX_Payments_MeterNumber ON Payments (MeterNumber);
-                ";
-                
-                // Execute each ALTER TABLE individually (SQLite doesn't support multiple in one statement)
-                _context.Database.ExecuteSqlRaw("ALTER TABLE Payments ADD COLUMN Type TEXT NOT NULL DEFAULT 'MobilePayment'");
-                _context.Database.ExecuteSqlRaw("ALTER TABLE Payments ADD COLUMN MeterNumber TEXT");
-                _context.Database.ExecuteSqlRaw("ALTER TABLE Payments ADD COLUMN Token TEXT");
-                _context.Database.ExecuteSqlRaw("ALTER TABLE Payments ADD COLUMN SequenceNumber INTEGER");
-                _context.Database.ExecuteSqlRaw("ALTER TABLE Payments ADD COLUMN EnergyCost REAL");
-                _context.Database.ExecuteSqlRaw("ALTER TABLE Payments ADD COLUMN MeterRent REAL");
-                _context.Database.ExecuteSqlRaw("ALTER TABLE Payments ADD COLUMN DemandCharge REAL");
-                _context.Database.ExecuteSqlRaw("ALTER TABLE Payments ADD COLUMN VAT REAL");
-                _context.Database.ExecuteSqlRaw("ALTER TABLE Payments ADD COLUMN Rebate REAL");
-                _context.Database.ExecuteSqlRaw("ALTER TABLE Payments ADD COLUMN ArrearAmount REAL");
-                _context.Database.ExecuteSqlRaw("ALTER TABLE Payments ADD COLUMN VendingAmount REAL");
-                _context.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_Payments_Type ON Payments (Type)");
-                _context.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_Payments_MeterNumber ON Payments (MeterNumber)");
-                
-                System.Diagnostics.Debug.WriteLine("Schema migration completed successfully");
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("Schema is up to date");
-            }
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Schema migration error: {ex.Message}");
-            // Don't throw - let the app continue, the error will surface during actual queries
-        }
-    }
-    
     private void CreatePaymentsTableManually()
     {
         var createTableSql = @"
             CREATE TABLE IF NOT EXISTS Payments (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                Type TEXT NOT NULL DEFAULT 'MobilePayment',
                 Amount REAL NOT NULL,
-                Provider TEXT NOT NULL,
-                TransactionId TEXT,
-                PhoneNumber TEXT,
                 MeterNumber TEXT,
                 Token TEXT,
                 SequenceNumber INTEGER,
@@ -156,6 +88,7 @@ public class DatabaseService : IDatabaseService
                 Rebate REAL,
                 ArrearAmount REAL,
                 VendingAmount REAL,
+                TransactionId TEXT,
                 PaymentDate TEXT NOT NULL,
                 CreatedAt TEXT NOT NULL,
                 SmsText TEXT,
@@ -163,10 +96,9 @@ public class DatabaseService : IDatabaseService
                 Notes TEXT
             );
             
-            CREATE INDEX IF NOT EXISTS IX_Payments_TransactionId ON Payments (TransactionId);
-            CREATE INDEX IF NOT EXISTS IX_Payments_PaymentDate ON Payments (PaymentDate);
-            CREATE INDEX IF NOT EXISTS IX_Payments_Type ON Payments (Type);
             CREATE INDEX IF NOT EXISTS IX_Payments_MeterNumber ON Payments (MeterNumber);
+            CREATE INDEX IF NOT EXISTS IX_Payments_PaymentDate ON Payments (PaymentDate);
+            CREATE INDEX IF NOT EXISTS IX_Payments_TransactionId ON Payments (TransactionId);
         ";
         
         _context.Database.ExecuteSqlRaw(createTableSql);
@@ -191,7 +123,7 @@ public class DatabaseService : IDatabaseService
     {
         try
         {
-            return await _context.Database.CanConnectAsync();
+            return await _context.Payments.AnyAsync();
         }
         catch
         {
@@ -214,14 +146,6 @@ public class DatabaseService : IDatabaseService
             .ToListAsync();
     }
 
-    public async Task<List<Payment>> GetPaymentsByProviderAsync(PaymentProvider provider)
-    {
-        return await _context.Payments
-            .Where(p => p.Provider == provider)
-            .OrderByDescending(p => p.PaymentDate)
-            .ToListAsync();
-    }
-
     public async Task<Payment?> GetPaymentByIdAsync(int id)
     {
         return await _context.Payments.FindAsync(id);
@@ -238,7 +162,7 @@ public class DatabaseService : IDatabaseService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Add payment error: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"Error adding payment: {ex.Message}");
             return false;
         }
     }
@@ -253,7 +177,7 @@ public class DatabaseService : IDatabaseService
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Update payment error: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"Error updating payment: {ex.Message}");
             return false;
         }
     }
@@ -263,15 +187,17 @@ public class DatabaseService : IDatabaseService
         try
         {
             var payment = await _context.Payments.FindAsync(id);
-            if (payment == null) return false;
-
-            _context.Payments.Remove(payment);
-            await _context.SaveChangesAsync();
-            return true;
+            if (payment != null)
+            {
+                _context.Payments.Remove(payment);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Delete payment error: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"Error deleting payment: {ex.Message}");
             return false;
         }
     }
@@ -281,9 +207,6 @@ public class DatabaseService : IDatabaseService
         var allPayments = await _context.Payments.ToListAsync();
         var today = DateTime.Today;
         var startOfMonth = new DateTime(today.Year, today.Month, 1);
-
-        var mobilePayments = allPayments.Where(p => p.Type == PaymentType.MobilePayment).ToList();
-        var electricityPayments = allPayments.Where(p => p.Type == PaymentType.ElectricityToken).ToList();
 
         var stats = new PaymentStatistics
         {
@@ -295,24 +218,31 @@ public class DatabaseService : IDatabaseService
             ThisMonthAmount = allPayments.Where(p => p.PaymentDate >= startOfMonth).Sum(p => p.Amount),
             ThisMonthCount = allPayments.Count(p => p.PaymentDate >= startOfMonth),
             
-            // Mobile Payment Breakdown
-            BKashAmount = mobilePayments.Where(p => p.Provider == PaymentProvider.bKash).Sum(p => p.Amount),
-            NagadAmount = mobilePayments.Where(p => p.Provider == PaymentProvider.Nagad).Sum(p => p.Amount),
-            RocketAmount = mobilePayments.Where(p => p.Provider == PaymentProvider.Rocket).Sum(p => p.Amount),
-            OtherAmount = mobilePayments.Where(p => p.Provider == PaymentProvider.Other).Sum(p => p.Amount),
-            
-            // By Type
-            MobilePaymentCount = mobilePayments.Count,
-            MobilePaymentAmount = mobilePayments.Sum(p => p.Amount),
-            ElectricityTokenCount = electricityPayments.Count,
-            ElectricityTokenAmount = electricityPayments.Sum(p => p.Amount),
-            
             // Electricity Specific
-            TotalEnergyCost = electricityPayments.Sum(p => p.EnergyCost ?? 0),
-            TotalMeterRent = electricityPayments.Sum(p => p.MeterRent ?? 0),
-            TotalDemandCharge = electricityPayments.Sum(p => p.DemandCharge ?? 0)
+            TotalEnergyCost = allPayments.Sum(p => p.EnergyCost ?? 0),
+            TotalMeterRent = allPayments.Sum(p => p.MeterRent ?? 0),
+            TotalDemandCharge = allPayments.Sum(p => p.DemandCharge ?? 0),
+            TotalVAT = allPayments.Sum(p => p.VAT ?? 0),
+            TotalRebate = allPayments.Sum(p => p.Rebate ?? 0)
         };
 
         return stats;
+    }
+
+    public async Task<List<Payment>> SearchPaymentsAsync(string searchTerm)
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            return await GetAllPaymentsAsync();
+        }
+
+        return await _context.Payments
+            .Where(p => 
+                (p.MeterNumber != null && p.MeterNumber.Contains(searchTerm)) ||
+                (p.Token != null && p.Token.Contains(searchTerm)) ||
+                (p.TransactionId != null && p.TransactionId.Contains(searchTerm)) ||
+                (p.CustomerName != null && p.CustomerName.Contains(searchTerm)))
+            .OrderByDescending(p => p.PaymentDate)
+            .ToListAsync();
     }
 }

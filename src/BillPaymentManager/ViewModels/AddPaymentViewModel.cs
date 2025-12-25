@@ -87,7 +87,7 @@ public partial class AddPaymentViewModel : ViewModelBase
                 
                 if (result == MessageBoxResult.Yes)
                 {
-                    _printService.PrintReceipt(ParsedPayment);
+                    _printService.ShowPrintPreview(ParsedPayment);
                 }
                 
                 // Reset form
@@ -119,8 +119,8 @@ public partial class AddPaymentViewModel : ViewModelBase
     {
         if (ParsedPayment != null)
         {
-            _printService.PrintReceipt(ParsedPayment);
-            StatusMessage = "Receipt sent to printer";
+            _printService.ShowPrintPreview(ParsedPayment);
+            StatusMessage = "Receipt preview opened";
         }
     }
 }

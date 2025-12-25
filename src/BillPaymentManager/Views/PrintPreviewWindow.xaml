@@ -283,6 +283,12 @@
                     Orientation="Horizontal" 
                     HorizontalAlignment="Center"
                     Margin="0,0,0,20">
+            <Button Content="⚙️ Settings" 
+                    Click="PrinterSettingsButton_Click"
+                    Style="{StaticResource PrintButtonStyle}"
+                    Background="#3498db"
+                    Margin="5,5,20,5"/>
+            
             <Button Content="🖨️ Print" 
                     Click="PrintButton_Click"
                     Style="{StaticResource PrintButtonStyle}"/>

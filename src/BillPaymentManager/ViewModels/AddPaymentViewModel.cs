@@ -40,7 +40,7 @@ public partial class AddPaymentViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void ParseSms()
+    private async Task ParseAndSave()
     {
         if (string.IsNullOrWhiteSpace(SmsText))
         {
@@ -53,7 +53,28 @@ public partial class AddPaymentViewModel : ViewModelBase
         if (ParsedPayment != null)
         {
             IsParsed = true;
-            StatusMessage = $"Electricity token parsed successfully! Meter: {ParsedPayment.MeterNumber}";
+            
+            // Auto-save
+            IsSaving = true;
+            try
+            {
+                var success = await _databaseService.AddPaymentAsync(ParsedPayment);
+                if (success)
+                {
+                    StatusMessage = "Payment saved successfully! Opening preview...";
+                    // Show preview
+                    _printService.ShowPrintPreview(ParsedPayment);
+                }
+                else
+                {
+                    StatusMessage = "Parsed but failed to save to database";
+                    MessageBox.Show("Failed to save payment to database", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            finally
+            {
+                IsSaving = false;
+            }
         }
         else
         {

@@ -26,6 +26,28 @@ public partial class PrintPreviewWindow : Window
             PrintDocument printDoc = new PrintDocument();
             printDoc.PrintPage += PrintPage;
             
+            // Direct print to default printer
+            printDoc.Print();
+            
+            MessageBox.Show("Receipt sent to printer successfully!", "Success", 
+                MessageBoxButton.OK, MessageBoxImage.Information);
+            DialogResult = true;
+            Close();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Print failed: {ex.Message}", "Error", 
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void PrinterSettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            PrintDocument printDoc = new PrintDocument();
+            printDoc.PrintPage += PrintPage;
+            
             // Show print dialog
             var printDialog = new System.Windows.Forms.PrintDialog();
             printDialog.Document = printDoc;
@@ -41,7 +63,7 @@ public partial class PrintPreviewWindow : Window
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Print failed: {ex.Message}", "Error", 
+            MessageBox.Show($"Settings/Print failed: {ex.Message}", "Error", 
                 MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }

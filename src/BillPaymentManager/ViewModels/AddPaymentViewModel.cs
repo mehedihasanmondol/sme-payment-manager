@@ -64,6 +64,10 @@ public partial class AddPaymentViewModel : ViewModelBase
                     StatusMessage = "Payment saved successfully! Opening preview...";
                     // Show preview
                     _printService.ShowPrintPreview(ParsedPayment);
+                    
+                    // Clear form after print/preview is closed (whether printed or cancelled)
+                    ResetForm();
+                    StatusMessage = "Ready for next payment";
                 }
                 else
                 {

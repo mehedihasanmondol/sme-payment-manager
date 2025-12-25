@@ -92,72 +92,7 @@
                 </StackPanel>
             </Border>
             
-            <!-- By Provider -->
-            <TextBlock Text="By Provider" 
-                       FontSize="20" 
-                       FontWeight="SemiBold"
-                       Margin="0,30,0,10"/>
-            
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                
-                <Border Grid.Column="0" Style="{StaticResource CardStyle}">
-                    <StackPanel>
-                        <TextBlock Text="bKash" 
-                                   FontSize="14" 
-                                   Foreground="#7f8c8d"/>
-                        <TextBlock Text="{Binding BKashAmount, StringFormat='৳{0:N2}'}" 
-                                   FontSize="24" 
-                                   FontWeight="Bold"
-                                   Foreground="#e11484"
-                                   Margin="0,5,0,0"/>
-                    </StackPanel>
-                </Border>
-                
-                <Border Grid.Column="1" Style="{StaticResource CardStyle}">
-                    <StackPanel>
-                        <TextBlock Text="Nagad" 
-                                   FontSize="14" 
-                                   Foreground="#7f8c8d"/>
-                        <TextBlock Text="{Binding NagadAmount, StringFormat='৳{0:N2}'}" 
-                                   FontSize="24" 
-                                   FontWeight="Bold"
-                                   Foreground="#f26125"
-                                   Margin="0,5,0,0"/>
-                    </StackPanel>
-                </Border>
-                
-                <Border Grid.Column="2" Style="{StaticResource CardStyle}">
-                    <StackPanel>
-                        <TextBlock Text="Rocket" 
-                                   FontSize="14" 
-                                   Foreground="#7f8c8d"/>
-                        <TextBlock Text="{Binding RocketAmount, StringFormat='৳{0:N2}'}" 
-                                   FontSize="24" 
-                                   FontWeight="Bold"
-                                   Foreground="#8e44ad"
-                                   Margin="0,5,0,0"/>
-                    </StackPanel>
-                </Border>
-                
-                <Border Grid.Column="3" Style="{StaticResource CardStyle}">
-                    <StackPanel>
-                        <TextBlock Text="Other" 
-                                   FontSize="14" 
-                                   Foreground="#7f8c8d"/>
-                        <TextBlock Text="{Binding OtherAmount, StringFormat='৳{0:N2}'}" 
-                                   FontSize="24" 
-                                   FontWeight="Bold"
-                                   Foreground="#95a5a6"
-                                   Margin="0,5,0,0"/>
-                    </StackPanel>
-                </Border>
-            </Grid>
+           
             
         </StackPanel>
     </ScrollViewer>

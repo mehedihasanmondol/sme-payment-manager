@@ -144,3 +144,5 @@ C:\Users\Love Station\Documents\sme-payment-manager\src\BillPaymentManager\obj\D
 C:\Users\Love Station\Documents\sme-payment-manager\src\BillPaymentManager\obj\Debug\net8.0-windows\ref\BillPaymentManager.dll
 C:\Users\Love Station\Documents\sme-payment-manager\src\BillPaymentManager\obj\Debug\net8.0-windows\Views\PrintPreviewWindow.baml
 C:\Users\Love Station\Documents\sme-payment-manager\src\BillPaymentManager\obj\Debug\net8.0-windows\Views\PrintPreviewWindow.g.cs
+C:\Users\Love Station\Documents\sme-payment-manager\src\BillPaymentManager\obj\Debug\net8.0-windows\Views\DeveloperInfoView.baml
+C:\Users\Love Station\Documents\sme-payment-manager\src\BillPaymentManager\obj\Debug\net8.0-windows\Views\DeveloperInfoView.g.cs

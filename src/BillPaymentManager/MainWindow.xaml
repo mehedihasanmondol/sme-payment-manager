@@ -23,6 +23,9 @@
         <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
             <views:SettingsView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:DeveloperInfoViewModel}">
+            <views:DeveloperInfoView/>
+        </DataTemplate>
     </Window.Resources>
     
     <Grid>
@@ -45,6 +48,9 @@
                         Style="{StaticResource NavButtonStyle}"/>
                 <Button Content="⚙️ Settings" 
                         Command="{Binding NavigateToSettingsCommand}"
+                        Style="{StaticResource NavButtonStyle}"/>
+                <Button Content="👨‍💻 Developer" 
+                        Command="{Binding NavigateToDeveloperInfoCommand}"
                         Style="{StaticResource NavButtonStyle}"/>
             </StackPanel>
         </Border>

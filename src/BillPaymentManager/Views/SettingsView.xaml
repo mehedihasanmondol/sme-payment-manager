@@ -95,7 +95,7 @@
                 <TextBlock TextWrapping="Wrap" 
                            FontSize="13"
                            Foreground="#7f8c8d">
-                    <Run Text="For support and questions, please contact your system administrator."/>
+                    <Run Text="For technical support or inquiries, please refer to the Developer Info page."/>
                 </TextBlock>
             </StackPanel>
         </Border>

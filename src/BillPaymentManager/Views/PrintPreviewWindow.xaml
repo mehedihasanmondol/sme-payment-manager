@@ -231,7 +231,7 @@
                                    TextAlignment="Center"
                                    Margin="0,5,0,2"/>
                         
-                        <TextBlock Text="Developed by: Abu Kahar Siddiq" 
+                        <TextBlock Text="Developed by: Mehedi Hasan Mondol" 
                                    FontSize="10" 
                                    TextAlignment="Center"
                                    Foreground="#666"

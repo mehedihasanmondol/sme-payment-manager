@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
 C:\Users\Love Station\Documents\sme-payment-manager\src\BillPaymentManager\App.xaml
-7-199077323
+8-1516615953
 
-26909774395
+28-1730660087
 228-1270519340
-MainWindow.xaml;Resources\Styles\AppStyles.xaml;Views\AddPaymentView.xaml;Views\DashboardView.xaml;Views\HistoryView.xaml;Views\PrintPreviewWindow.xaml;Views\SettingsView.xaml;
+MainWindow.xaml;Resources\Styles\AppStyles.xaml;Views\AddPaymentView.xaml;Views\DashboardView.xaml;Views\DeveloperInfoView.xaml;Views\HistoryView.xaml;Views\PrintPreviewWindow.xaml;Views\SettingsView.xaml;
 
 False
 

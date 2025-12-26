@@ -18,14 +18,18 @@ public partial class MainViewModel : ViewModelBase
     public DashboardViewModel DashboardViewModel { get; }
     public AddPaymentViewModel AddPaymentViewModel { get; }
     public HistoryViewModel HistoryViewModel { get; }
+
     public SettingsViewModel SettingsViewModel { get; }
+    public DeveloperInfoViewModel DeveloperInfoViewModel { get; }
 
     public MainViewModel()
     {
         DashboardViewModel = new DashboardViewModel();
         AddPaymentViewModel = new AddPaymentViewModel();
         HistoryViewModel = new HistoryViewModel();
+
         SettingsViewModel = new SettingsViewModel();
+        DeveloperInfoViewModel = new DeveloperInfoViewModel();
 
         // Set dashboard as default view
         CurrentViewModel = DashboardViewModel;
@@ -55,5 +59,12 @@ public partial class MainViewModel : ViewModelBase
     private void NavigateToSettings()
     {
         CurrentViewModel = SettingsViewModel;
+    }
+
+
+    [RelayCommand]
+    private void NavigateToDeveloperInfo()
+    {
+        CurrentViewModel = DeveloperInfoViewModel;
     }
 }

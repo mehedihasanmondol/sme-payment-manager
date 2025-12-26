@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BillPaymentManager.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e01e26ba7ae184bc2fbaf87861e8c7d05092de77")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8becbbb79a513fc969fada6a6dce567de45e234e")]
 [assembly: System.Reflection.AssemblyProductAttribute("BillPaymentManager.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BillPaymentManager.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

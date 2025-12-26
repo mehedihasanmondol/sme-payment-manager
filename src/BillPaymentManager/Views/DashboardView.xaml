@@ -15,13 +15,6 @@
                        Foreground="#2C3E50"
                        Margin="0,0,0,20"/>
             
-            <!-- Refresh Button -->
-            <Button Content="🔄 Refresh" 
-                    Command="{Binding LoadDataCommand}"
-                    Style="{StaticResource PrimaryButtonStyle}"
-                    HorizontalAlignment="Left"
-                    Margin="0,0,0,20"/>
-            
             <!-- Performance Overview -->
             <TextBlock Text="Performance Overview" 
                        FontSize="20" 
@@ -92,11 +85,49 @@
             
            
             
-            <!-- Business Analytics -->
-            <TextBlock Text="Business Analytics" 
-                       FontSize="20" 
-                       FontWeight="SemiBold"
-                       Margin="0,30,0,10"/>
+            <!-- Business Analytics Header with Filters -->
+            <Grid Margin="0,30,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel>
+                    <TextBlock Text="Business Analytics" 
+                               FontSize="20" 
+                               FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding DateRangeHint}" 
+                               FontSize="12" 
+                               Foreground="#7f8c8d" 
+                               Margin="0,2,0,0"/>
+                </StackPanel>
+
+                <!-- Filters -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <StackPanel Margin="0,0,10,0">
+                         <TextBlock Text="From" FontSize="10" Foreground="#7f8c8d"/>
+                         <DatePicker SelectedDate="{Binding StartDate}" Width="100"/>
+                    </StackPanel>
+                    
+                    <StackPanel Margin="0,0,10,0">
+                         <TextBlock Text="To" FontSize="10" Foreground="#7f8c8d"/>
+                         <DatePicker SelectedDate="{Binding EndDate}" Width="100"/>
+                    </StackPanel>
+                    
+                    <Button Content="Filter" 
+                            Command="{Binding FilterDataCommand}" 
+                            Style="{StaticResource PrimaryButtonStyle}" 
+                            Margin="0,12,5,0" 
+                            Padding="10,5" FontSize="12"/>
+                            
+                    <Button Content="Reset" 
+                            Command="{Binding ClearFilterCommand}" 
+                            Style="{StaticResource PrintButtonStyle}" 
+                            Background="#95a5a6"
+                            Margin="0,12,0,0" 
+                            Padding="10,5" FontSize="12"/>
+                </StackPanel>
+            </Grid>
             
             <Grid>
                 <Grid.ColumnDefinitions>

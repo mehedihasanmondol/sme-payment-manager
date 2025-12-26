@@ -15,5 +15,6 @@ public interface IDatabaseService
     Task<bool> UpdatePaymentAsync(Payment payment);
     Task<bool> DeletePaymentAsync(int id);
     Task<PaymentStatistics> GetStatisticsAsync();
+    Task<PaymentStatistics> GetStatisticsByDateRangeAsync(DateTime? startDate, DateTime? endDate);
     Task<List<Payment>> SearchPaymentsAsync(string searchTerm);
 }

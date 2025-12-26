@@ -204,26 +204,53 @@ public class DatabaseService : IDatabaseService
 
     public async Task<PaymentStatistics> GetStatisticsAsync()
     {
-        var allPayments = await _context.Payments.ToListAsync();
+        return await GetStatisticsByDateRangeAsync(null, null);
+    }
+
+    public async Task<PaymentStatistics> GetStatisticsByDateRangeAsync(DateTime? startDate, DateTime? endDate)
+    {
+        var allPayments = await _context.Payments.ToListAsync(); // In a real app, do DB-side filtering, but SQLite is small here
+        
+        // Absolute Metrics (Always Today/This Month relative to NOW)
         var today = DateTime.Today;
         var startOfMonth = new DateTime(today.Year, today.Month, 1);
+        
+        var todayPayments = allPayments.Where(p => p.PaymentDate.Date == today).ToList();
+        var monthPayments = allPayments.Where(p => p.PaymentDate >= startOfMonth).ToList();
+
+        // Filtered Metrics (Based on Range)
+        IEnumerable<Payment> filteredPayments = allPayments;
+        
+        if (startDate.HasValue)
+        {
+            filteredPayments = filteredPayments.Where(p => p.PaymentDate.Date >= startDate.Value.Date);
+        }
+        
+        if (endDate.HasValue)
+        {
+            filteredPayments = filteredPayments.Where(p => p.PaymentDate.Date <= endDate.Value.Date);
+        }
+        
+        var filteredList = filteredPayments.ToList();
 
         var stats = new PaymentStatistics
         {
-            // Overall Statistics
-            TotalAmount = allPayments.Sum(p => p.Amount),
-            TotalCount = allPayments.Count,
-            TodayAmount = allPayments.Where(p => p.PaymentDate.Date == today).Sum(p => p.Amount),
-            TodayCount = allPayments.Count(p => p.PaymentDate.Date == today),
-            ThisMonthAmount = allPayments.Where(p => p.PaymentDate >= startOfMonth).Sum(p => p.Amount),
-            ThisMonthCount = allPayments.Count(p => p.PaymentDate >= startOfMonth),
+            // Absolute Stats
+            TodayAmount = todayPayments.Sum(p => p.Amount),
+            TodayCount = todayPayments.Count,
+            ThisMonthAmount = monthPayments.Sum(p => p.Amount),
+            ThisMonthCount = monthPayments.Count,
             
-            // Electricity Specific
-            TotalEnergyCost = allPayments.Sum(p => p.EnergyCost ?? 0),
-            TotalMeterRent = allPayments.Sum(p => p.MeterRent ?? 0),
-            TotalDemandCharge = allPayments.Sum(p => p.DemandCharge ?? 0),
-            TotalVAT = allPayments.Sum(p => p.VAT ?? 0),
-            TotalRebate = allPayments.Sum(p => p.Rebate ?? 0)
+            // Filtered Stats (Total becomes "Total for Range")
+            TotalAmount = filteredList.Sum(p => p.Amount),
+            TotalCount = filteredList.Count,
+            
+            // Electricity Specific (Filtered)
+            TotalEnergyCost = filteredList.Sum(p => p.EnergyCost ?? 0),
+            TotalMeterRent = filteredList.Sum(p => p.MeterRent ?? 0),
+            TotalDemandCharge = filteredList.Sum(p => p.DemandCharge ?? 0),
+            TotalVAT = filteredList.Sum(p => p.VAT ?? 0),
+            TotalRebate = filteredList.Sum(p => p.Rebate ?? 0)
         };
 
         return stats;

@@ -10,43 +10,6 @@
         WindowStartupLocation="CenterOwner"
         Background="#f5f5f5">
     
-    <Window.Resources>
-        <Style x:Key="PrintButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#27ae60"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Padding" Value="20,10"/>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="5"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#229954"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-        
-        <Style x:Key="CancelButtonStyle" TargetType="Button" BasedOn="{StaticResource PrintButtonStyle}">
-            <Setter Property="Background" Value="#95a5a6"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#7f8c8d"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-    </Window.Resources>
     
     <Grid>
         <Grid.RowDefinitions>

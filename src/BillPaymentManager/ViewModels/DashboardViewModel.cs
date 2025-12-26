@@ -54,8 +54,23 @@ public partial class DashboardViewModel : ViewModelBase
     public DashboardViewModel()
     {
         _databaseService = new DatabaseService();
+        
+        // Default to Today
+        StartDate = DateTime.Today;
+        EndDate = DateTime.Today;
+        UpdateDateRangeHint();
+        
         // Don't auto-load - let the view trigger this when ready
     }
+
+    [ObservableProperty]
+    private DateTime? _startDate;
+
+    [ObservableProperty]
+    private DateTime? _endDate;
+
+    [ObservableProperty]
+    private string _dateRangeHint = "(All Time Data)";
 
     [RelayCommand]
     private async Task LoadData()
@@ -63,25 +78,65 @@ public partial class DashboardViewModel : ViewModelBase
         IsLoading = true;
         try
         {
-            var stats = await _databaseService.GetStatisticsAsync();
+            // 1. Fetch Global Stats (Today, Month, All Time) - Unaffected by filter
+            var globalStats = await _databaseService.GetStatisticsByDateRangeAsync(null, null);
             
-            TotalAmount = stats.TotalAmount;
-            TodayAmount = stats.TodayAmount;
-            ThisMonthAmount = stats.ThisMonthAmount;
-            TotalCount = stats.TotalCount;
-            TodayCount = stats.TodayCount;
-            ThisMonthCount = stats.ThisMonthCount;
+            TotalAmount = globalStats.TotalAmount;
+            TotalCount = globalStats.TotalCount;
+            TodayAmount = globalStats.TodayAmount;
+            TodayCount = globalStats.TodayCount;
+            ThisMonthAmount = globalStats.ThisMonthAmount;
+            ThisMonthCount = globalStats.ThisMonthCount;
             
-            // Electricity-specific
-            TotalEnergyCost = stats.TotalEnergyCost;
-            TotalMeterRent = stats.TotalMeterRent;
-            TotalDemandCharge = stats.TotalDemandCharge;
-            TotalVAT = stats.TotalVAT;
-            TotalRebate = stats.TotalRebate;
+            // 2. Fetch Business Analytics - Affected by filter
+            var filteredStats = await _databaseService.GetStatisticsByDateRangeAsync(StartDate, EndDate);
+            
+            // Electricity-specific (Business Analytics)
+            TotalEnergyCost = filteredStats.TotalEnergyCost;
+            TotalMeterRent = filteredStats.TotalMeterRent;
+            TotalDemandCharge = filteredStats.TotalDemandCharge;
+            TotalVAT = filteredStats.TotalVAT;
+            TotalRebate = filteredStats.TotalRebate;
+            
+            UpdateDateRangeHint();
         }
         finally
         {
             IsLoading = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task FilterData()
+    {
+        await LoadData();
+    }
+
+    [RelayCommand]
+    private async Task ClearFilter()
+    {
+        StartDate = null;
+        EndDate = null;
+        await LoadData();
+    }
+    
+    private void UpdateDateRangeHint()
+    {
+        if (StartDate == null && EndDate == null)
+        {
+            DateRangeHint = "(All Time Data)";
+        }
+        else if (StartDate != null && EndDate != null)
+        {
+            DateRangeHint = $"({StartDate:dd/MM/yyyy} - {EndDate:dd/MM/yyyy})";
+        }
+        else if (StartDate != null)
+        {
+             DateRangeHint = $"(From {StartDate:dd/MM/yyyy})";
+        }
+        else if (EndDate != null)
+        {
+             DateRangeHint = $"(Until {EndDate:dd/MM/yyyy})";
         }
     }
 }

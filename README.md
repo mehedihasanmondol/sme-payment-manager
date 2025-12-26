@@ -1,220 +1,87 @@
 # Bill Payment Manager
 
-A Windows desktop application for managing mobile payment receipts from bKash, Nagad, and Rocket in Bangladesh.
+A professional desktop application for managing prepaid electricity token sales, designed for high-efficiency business operations.
 
-## Features
+## Software Overview
+**Bill Payment Manager** automates the process of selling electricity tokens. It parses transaction SMS messages to extract critical data (Token, Meter Info, Cost Breakdown), saves the records to a local database, and generates professional thermal receipts. It also features a powerful dashboard for financial analytics.
 
-- ✅ **Automatic SMS Parsing**: Extract payment data from bKash, Nagad, and Rocket SMS
-- ✅ **Dashboard**: Real-time statistics showing today's, monthly, and all-time payment summaries
-- ✅ **Payment History**: Advanced filtering by date range, provider, transaction ID, phone number, or customer name
-- ✅ **Receipt Printing**: Generate and print formatted receipts for payment records
-- ✅ **SQLite Database**: Local data storage with automatic database creation and migrations
-- ✅ **MVVM Architecture**: Clean separation of concerns using the MVVM pattern
+**Key Features:**
+- **⚡ SMS Parsing:** Instantly extracts Token, Meter Number, Energy Cost, VAT, etc.
+- **🖨️ Smart Printing:** Auto-generates receipts with direct printing support.
+- **📊 Business Analytics:** Real-time financial insights (Energy Sold, Meter Rent, Demand Charge, VAT, Rebates).
+- **📅 Date Filtering:** Analyze business performance for any specific date range.
+- **💾 Local Database:** Secure, offline SQLite storage for all transaction history.
 
-## Technology Stack
+## User Guide
 
-- **.NET 8** - Cross-platform framework
-- **WPF** - Windows Presentation Foundation for UI
-- **MVVM** - Model-View-ViewModel pattern with CommunityToolkit.Mvvm
-- **Entity Framework Core** - ORM for SQLite database access
-- **SQLite** - Lightweight embedded database
+### 1. Dashboard
+The **Dashboard** is your home screen, split into two key areas:
+- **Performance Overview:** A static top row showing "Today", "This Month", and "All Time" sales totals. These numbers always show your current status.
+- **Business Analytics:** A detailed grid showing where your money is going (Energy vs VAT vs Fees). 
+  - **Filtering:** Use the Date Pickers in the Business Analytics header to filter this section by specific dates (e.g., "Last Month").
 
-## Prerequisites
+### 2. Selling a Token (Add Payment)
+1. Navigate to **➕ Add Payment**.
+2. **Paste SMS:** Copy the transaction SMS from your phone/provider and paste it into the box.
+3. Click **Parse & Save**. 
+   - The app reads the SMS, saves the data, and immediately opens the Receipt Preview.
+4. **Print:** Click the **Print** button to print the receipt for the customer.
+   - The form auto-clears so you are ready for the next customer immediately.
 
-- .NET 8.0 SDK or later
-- Windows 7 or later
-- VS Code with C# Dev Kit extension (recommended)
+### 3. Payment History
+- Navigate to **📜 History** to see a log of all past sales.
+- **Search:** Find a transaction by Meter Number, Customer Name, or Transaction ID.
+- **Reprint:** Select any row and click "Print" to issue a duplicate receipt.
+- **Delete:** Remove erroneous entries if necessary.
 
-## Installation & Setup
+### 4. Developer Info
+- Click **👨‍💻 Developer** in the menu to view the developer's contact information and support details.
 
-### 1. Clone or download this repository
+## Installation Guide
 
-```bash
-cd c:\Users\Love Station\Documents\sme-payment-manager
-```
+### Prerequisites
+- Windows 10 or Windows 11
+- .NET Desktop Runtime 8.0
 
-### 2. Restore dependencies
+### How to Install
+1. Download the application (Zip file).
+2. Extract contents to a folder.
+3. Run `BillPaymentManager.exe`.
+4. *No database setup required* - the app creates its own database automatically.
 
-```bash
-dotnet restore
-```
+## Development Guide
 
-### 3. Build the project
+### Project Structure
+- **Frontend:** WPF (Windows Presentation Foundation) with XAML.
+- **Pattern:** MVVM (Model-View-ViewModel) using `CommunityToolkit.Mvvm`.
+- **Database:** SQLite with Entity Framework Core.
+- **Reporting:** Custom PrintDocument implementation for thermal receipts.
 
-```bash
-dotnet build
-```
+### Setup for Developers
+1. **Clone** the repository.
+2. **Restore** dependencies:
+   ```bash
+   dotnet restore
+   ```
+3. **Build** the solution:
+   ```bash
+   dotnet build
+   ```
+4. **Run** locally:
+   ```bash
+   dotnet run --project src/BillPaymentManager/BillPaymentManager.csproj
+   ```
 
-### 4. Run the application
-
-```bash
-dotnet run --project src/BillPaymentManager/BillPaymentManager.csproj
-```
-
-Or press **F5** in VS Code to run with debugging.
-
-## Database
-
-The SQLite database is automatically created at:
-```
-%LOCALAPPDATA%\BillPaymentManager\payments.db
-```
-
-Example path:
-```
-C:\Users\YourName\AppData\Local\BillPaymentManager\payments.db
-```
-
-The database is created automatically on first run with Entity Framework migrations.
-
-## Usage
-
-### Adding a Payment
-
-1. Click **"➕ Add Payment"** from the navigation menu
-2. Paste the SMS text from bKash, Nagad, or Rocket into the text box
-3. Click **"🔍 Parse SMS"** to extract payment details
-4. Review the extracted information (you can add customer name and notes)
-5. Click **"💾 Save Payment"** to save to database
-6. Optionally print a receipt
-
-### Viewing Statistics
-
-Click **"📊 Dashboard"** to see:
-- Today's total amount and transaction count
-- This month's total amount and transaction count
-- All-time totals
-- Amount breakdown by provider (bKash, Nagad, Rocket, Other)
-
-### Payment History
-
-Click **"📜 History"** to:
-- View all payment records in a sortable table
-- Filter by date range
-- Filter by payment provider
-- Search by transaction ID, phone number, or customer name
-- Print selected receipts
-- Delete payment records
-
-### Settings
-
-Click **"⚙️ Settings"** to view:
-- Application version
-- Database location
-- Application information
-
-## Sample SMS Formats
-
-**bKash:**
-```
-You have received Tk 1,500.00 from 01711XXXXXX. TrxID ABC123XYZ at 25/12/2025 10:30 PM.
-```
-
-**Nagad:**
-```
-You have received ৳1,500.00 from 01711XXXXXX. Transaction ID: ABC123XYZ Date: 25/12/2025 10:30 PM.
-```
-
-**Rocket:**
-```
-You have received Tk 1,500.00 from 01711XXXXXX via Rocket. Trx ID: ABC123XYZ on 25/12/2025.
-```
-
-## Project Structure
-
-```
-BillPaymentManager/
-├── src/
-│   └── BillPaymentManager/
-│       ├── Models/                 # Data models (Payment, PaymentProvider, etc.)
-│       ├── ViewModels/             # MVVM ViewModels
-│       │   ├── Base/              # Base classes (ViewModelBase)
-│       │   ├── MainViewModel.cs
-│       │   ├── DashboardViewModel.cs
-│       │   ├── AddPaymentViewModel.cs
-│       │   ├── HistoryViewModel.cs
-│       │   └── SettingsViewModel.cs
-│       ├── Views/                  # XAML views
-│       │   ├── DashboardView.xaml
-│       │   ├── AddPaymentView.xaml
-│       │   ├── HistoryView.xaml
-│       │   └── SettingsView.xaml
-│       ├── Services/               # Business logic services
-│       │   ├── Interfaces/        # Service interfaces
-│       │   ├── DatabaseService.cs
-│       │   ├── SmsParserService.cs
-│       │   └── PrintService.cs
-│       ├── Data/                   # Database context and migrations
-│       │   └── AppDbContext.cs
-│       ├── Converters/             # XAML value converters
-│       ├── Resources/              # Styles and resources
-│       │   └── Styles/
-│       │       └── AppStyles.xaml
-│       ├── MainWindow.xaml         # Main application window
-│       └── App.xaml                # Application entry point
-└── tests/
-    └── BillPaymentManager.Tests/  # Unit tests
-```
-
-## NuGet Packages Used
-
-- **Microsoft.EntityFrameworkCore** (8.0.11) - ORM framework
-- **Microsoft.EntityFrameworkCore.Sqlite** (8.0.11) - SQLite provider
-- **Microsoft.EntityFrameworkCore.Tools** (10.0.1) - EF Core tools
-- **Microsoft.EntityFrameworkCore.Design** (8.0.11) - Design-time tools
-- **CommunityToolkit.Mvvm** (8.4.0) - MVVM helpers
-- **System.Drawing.Common** (10.0.1) - Printing support
-- **Moq** (4.20.72) - Mocking framework for tests
-
-## Development
-
-### Building
-
-```bash
-dotnet build
-```
-
-### Running Tests
-
-```bash
-dotnet test
-```
-
-### Creating a Migration
-
+### Database Migrations
+If you modify the `Payment` model, apply migrations:
 ```bash
 cd src/BillPaymentManager
-dotnet ef migrations add MigrationName
-```
-
-### Updating Database
-
-The database is automatically updated on application startup. Manual update:
-
-```bash
-cd src/BillPaymentManager
+dotnet ef migrations add <MigrationName>
 dotnet ef database update
 ```
 
-## Troubleshooting
-
-### Application won't start
-- Ensure .NET 8.0 SDK is installed: `dotnet --version`
-- Check that all NuGet packages are restored: `dotnet restore`
-
-### Database errors
-- Delete the database file and restart the application to recreate it
-- Location: `%LOCALAPPDATA%\BillPaymentManager\payments.db`
-
-### SMS parsing not working
-- Ensure the SMS text matches the expected format
-- Check that the SMS contains keywords like "bKash", "Nagad", or "Rocket"
-- Transaction ID and amount are required fields
-
-## License
-
-This project is for educational and internal use.
-
-## Support
-
-For questions or issues, please contact your system administrator.
+## Developer & Credits
+**Mehedi Hasan Mondol**  
+*AI IDE Specialist, Web App & Android Developer*  
+South Bagoan, Bagoan, Mothurapur, Doulotpur, Kushtia (7052)  
+[Website](https://websitelimited.com) | [Facebook](https://facebook.com/mehedihasmondol)

@@ -1,0 +1,30 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.userprefs
+
+# VS Code
+.vscode/
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+
+# Logs
+*.log
+
+# Rider / IntelliJ
+.idea/
+
+# Mac
+.DS_Store
+
+# Temporary
+tmp/
+*.tmp

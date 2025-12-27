@@ -1,7 +1,9 @@
 using System.Windows;
 using BillPaymentManager.Models;
+using BillPaymentManager.Services;
 using System.Drawing;
 using System.Drawing.Printing;
+using System.Linq;
 
 namespace BillPaymentManager.Views;
 
@@ -26,7 +28,46 @@ public partial class PrintPreviewWindow : Window
             PrintDocument printDoc = new PrintDocument();
             printDoc.PrintPage += PrintPage;
             
-            // Direct print to default printer
+            // Load saved settings
+            var settings = PrintSettingsManager.LoadSettings();
+            
+            // Apply saved printer if available
+            if (!string.IsNullOrEmpty(settings.PrinterName))
+            {
+                // Check if the saved printer still exists
+                var availablePrinters = PrinterSettings.InstalledPrinters.Cast<string>();
+                if (availablePrinters.Contains(settings.PrinterName))
+                {
+                    printDoc.PrinterSettings.PrinterName = settings.PrinterName;
+                }
+            }
+            
+            // Apply saved page settings
+            // Try to use the saved PaperKind if it's a standard size, otherwise use custom dimensions
+            var paperKind = (System.Drawing.Printing.PaperKind)settings.PaperKind;
+            if (paperKind == System.Drawing.Printing.PaperKind.Custom)
+            {
+                printDoc.DefaultPageSettings.PaperSize = new PaperSize(settings.PaperSizeName, settings.PaperWidth, settings.PaperHeight);
+            }
+            else
+            {
+                // For standard sizes, find matching PaperSize from printer's available sizes
+                var matchingPaper = printDoc.PrinterSettings.PaperSizes.Cast<PaperSize>()
+                    .FirstOrDefault(ps => ps.Kind == paperKind);
+                if (matchingPaper != null)
+                {
+                    printDoc.DefaultPageSettings.PaperSize = matchingPaper;
+                }
+                else
+                {
+                    // Fallback to custom if standard size not available
+                    printDoc.DefaultPageSettings.PaperSize = new PaperSize(settings.PaperSizeName, settings.PaperWidth, settings.PaperHeight);
+                }
+            }
+            printDoc.DefaultPageSettings.Margins = new Margins(settings.LeftMargin, settings.RightMargin, 
+                settings.TopMargin, settings.BottomMargin);
+            
+            // Direct print
             printDoc.Print();
             
             MessageBox.Show("Receipt sent to printer successfully!", "Success", 
@@ -48,14 +89,65 @@ public partial class PrintPreviewWindow : Window
             PrintDocument printDoc = new PrintDocument();
             printDoc.PrintPage += PrintPage;
             
+            // Load saved settings to pre-populate dialog
+            var settings = PrintSettingsManager.LoadSettings();
+            
+            // Apply saved printer if available
+            if (!string.IsNullOrEmpty(settings.PrinterName))
+            {
+                var availablePrinters = PrinterSettings.InstalledPrinters.Cast<string>();
+                if (availablePrinters.Contains(settings.PrinterName))
+                {
+                    printDoc.PrinterSettings.PrinterName = settings.PrinterName;
+                }
+            }
+            
+            // Apply saved page settings to pre-populate dialog
+            var paperKind = (System.Drawing.Printing.PaperKind)settings.PaperKind;
+            if (paperKind == System.Drawing.Printing.PaperKind.Custom)
+            {
+                printDoc.DefaultPageSettings.PaperSize = new PaperSize(settings.PaperSizeName, settings.PaperWidth, settings.PaperHeight);
+            }
+            else
+            {
+                var matchingPaper = printDoc.PrinterSettings.PaperSizes.Cast<PaperSize>()
+                    .FirstOrDefault(ps => ps.Kind == paperKind);
+                if (matchingPaper != null)
+                {
+                    printDoc.DefaultPageSettings.PaperSize = matchingPaper;
+                }
+                else
+                {
+                    printDoc.DefaultPageSettings.PaperSize = new PaperSize(settings.PaperSizeName, settings.PaperWidth, settings.PaperHeight);
+                }
+            }
+            printDoc.DefaultPageSettings.Margins = new Margins(settings.LeftMargin, settings.RightMargin, 
+                settings.TopMargin, settings.BottomMargin);
+            
             // Show print dialog
             var printDialog = new System.Windows.Forms.PrintDialog();
             printDialog.Document = printDoc;
             
             if (printDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
+                // Save the selected settings for future use
+                var paperSize = printDoc.DefaultPageSettings.PaperSize;
+                var newSettings = new PrintSettings
+                {
+                    PrinterName = printDoc.PrinterSettings.PrinterName,
+                    PaperSizeName = paperSize.PaperName,
+                    PaperKind = (int)paperSize.Kind,
+                    PaperWidth = paperSize.Width,
+                    PaperHeight = paperSize.Height,
+                    LeftMargin = printDoc.DefaultPageSettings.Margins.Left,
+                    RightMargin = printDoc.DefaultPageSettings.Margins.Right,
+                    TopMargin = printDoc.DefaultPageSettings.Margins.Top,
+                    BottomMargin = printDoc.DefaultPageSettings.Margins.Bottom
+                };
+                PrintSettingsManager.SaveSettings(newSettings);
+                
                 printDoc.Print();
-                MessageBox.Show("Receipt sent to printer successfully!", "Success", 
+                MessageBox.Show("Receipt sent to printer successfully!\nYour printer settings have been saved.", "Success", 
                     MessageBoxButton.OK, MessageBoxImage.Information);
                 DialogResult = true;
                 Close();

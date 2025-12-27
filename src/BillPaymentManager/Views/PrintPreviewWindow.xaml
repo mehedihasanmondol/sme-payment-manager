@@ -256,6 +256,11 @@
             <Button Content="🖨️ Print" 
                     Click="PrintButton_Click"
                     Style="{StaticResource PrintButtonStyle}"/>
+            <Button Content="📄 PDF" 
+                    Click="DownloadPdfButton_Click"
+                    Style="{StaticResource PrintButtonStyle}"
+                    Background="#27ae60"
+                    Margin="5,5,5,5"/>
             <Button Content="❌ Close" 
                     Click="CancelButton_Click"
                     Style="{StaticResource CancelButtonStyle}"/>

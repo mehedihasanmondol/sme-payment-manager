@@ -269,6 +269,7 @@
                 <!-- Right: Actions -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal">
                     <Button Content="🖨️ Print" Command="{Binding PrintSelectedCommand}" Style="{StaticResource PrimaryButtonStyle}" Width="85" Height="38" Margin="3,0"/>
+                    <Button Content="📄 PDF" Command="{Binding DownloadPdfCommand}" Style="{StaticResource PrimaryButtonStyle}" Width="85" Height="38" Margin="3,0" Background="#27ae60"/>
                     <Button Content="🗑️ Delete" Command="{Binding DeleteSelectedCommand}" Style="{StaticResource DangerButtonStyle}" Width="100" Height="38" Margin="3,0"/>
                 </StackPanel>
             </Grid>

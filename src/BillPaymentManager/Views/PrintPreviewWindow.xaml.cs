@@ -1,6 +1,7 @@
 using System.Windows;
 using BillPaymentManager.Models;
 using BillPaymentManager.Services;
+using BillPaymentManager.Services.Interfaces;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.Linq;
@@ -13,11 +14,13 @@ namespace BillPaymentManager.Views;
 public partial class PrintPreviewWindow : Window
 {
     private readonly Payment _payment;
+    private readonly IPdfService _pdfService;
     
     public PrintPreviewWindow(Payment payment)
     {
         InitializeComponent();
         _payment = payment;
+        _pdfService = new PdfService();
         DataContext = payment;
     }
     
@@ -164,6 +167,45 @@ public partial class PrintPreviewWindow : Window
     {
         DialogResult = false;
         Close();
+    }
+    
+    private void DownloadPdfButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            // Create suggested filename
+            var meterNumber = _payment.MeterNumber?.Replace(" ", "_") ?? "Unknown";
+            var date = _payment.PaymentDate.ToString("yyyyMMdd_HHmmss");
+            var suggestedFileName = $"Receipt_{meterNumber}_{date}.pdf";
+            
+            // Show save file dialog
+            var saveFileDialog = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = "PDF files (*.pdf)|*.pdf",
+                FileName = suggestedFileName,
+                DefaultExt = ".pdf",
+                AddExtension = true,
+                Title = "Save Receipt as PDF"
+            };
+            
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                // Generate and save PDF
+                _pdfService.GeneratePdf(_payment, saveFileDialog.FileName);
+                
+                MessageBox.Show($"PDF saved successfully!\n\nLocation: {saveFileDialog.FileName}", 
+                    "Success", 
+                    MessageBoxButton.OK, 
+                    MessageBoxImage.Information);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Failed to save PDF: {ex.Message}", 
+                "Error", 
+                MessageBoxButton.OK, 
+                MessageBoxImage.Error);
+        }
     }
     
     private void PrintPage(object sender, PrintPageEventArgs e)

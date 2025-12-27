@@ -16,6 +16,7 @@ public partial class HistoryViewModel : ViewModelBase
 {
     private readonly IDatabaseService _databaseService;
     private readonly IPrintService _printService;
+    private readonly IPdfService _pdfService;
 
     [ObservableProperty]
     private ObservableCollection<Payment> _payments = new();
@@ -53,6 +54,7 @@ public partial class HistoryViewModel : ViewModelBase
     {
         _databaseService = new DatabaseService();
         _printService = new PrintService();
+        _pdfService = new PdfService();
         
         // Set default date range to current month
         StartDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
@@ -136,6 +138,53 @@ public partial class HistoryViewModel : ViewModelBase
         if (SelectedPayment != null)
         {
             _printService.ShowPrintPreview(SelectedPayment);
+        }
+    }
+
+    [RelayCommand]
+    private void DownloadPdf()
+    {
+        if (SelectedPayment == null)
+        {
+            MessageBox.Show("Please select a payment record first.", "No Selection", 
+                MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        try
+        {
+            // Create suggested filename
+            var meterNumber = SelectedPayment.MeterNumber?.Replace(" ", "_") ?? "Unknown";
+            var date = SelectedPayment.PaymentDate.ToString("yyyyMMdd_HHmmss");
+            var suggestedFileName = $"Receipt_{meterNumber}_{date}.pdf";
+            
+            // Show save file dialog
+            var saveFileDialog = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = "PDF files (*.pdf)|*.pdf",
+                FileName = suggestedFileName,
+                DefaultExt = ".pdf",
+                AddExtension = true,
+                Title = "Save Receipt as PDF"
+            };
+            
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                // Generate and save PDF
+                _pdfService.GeneratePdf(SelectedPayment, saveFileDialog.FileName);
+                
+                MessageBox.Show($"PDF saved successfully!\n\nLocation: {saveFileDialog.FileName}", 
+                    "Success", 
+                    MessageBoxButton.OK, 
+                    MessageBoxImage.Information);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Failed to save PDF: {ex.Message}", 
+                "Error", 
+                MessageBoxButton.OK, 
+                MessageBoxImage.Error);
         }
     }
 

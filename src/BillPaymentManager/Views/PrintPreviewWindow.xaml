@@ -256,7 +256,7 @@
             <Button Content="🖨️ Print" 
                     Click="PrintButton_Click"
                     Style="{StaticResource PrintButtonStyle}"/>
-            <Button Content="❌ Cancel" 
+            <Button Content="❌ Close" 
                     Click="CancelButton_Click"
                     Style="{StaticResource CancelButtonStyle}"/>
         </StackPanel>

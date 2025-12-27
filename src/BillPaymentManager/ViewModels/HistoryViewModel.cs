@@ -35,6 +35,20 @@ public partial class HistoryViewModel : ViewModelBase
     [ObservableProperty]
     private string _searchText = string.Empty;
 
+    [ObservableProperty]
+    private int _currentPage = 1;
+
+    [ObservableProperty]
+    private int _pageSize = 10;
+
+    [ObservableProperty]
+    private int _totalPages = 1;
+
+    [ObservableProperty]
+    private int _totalRecords;
+
+    private List<Payment> _allFilteredPayments = new();
+
     public HistoryViewModel()
     {
         _databaseService = new DatabaseService();
@@ -73,15 +87,31 @@ public partial class HistoryViewModel : ViewModelBase
                 ).ToList();
             }
 
-            Payments.Clear();
-            foreach (var payment in payments)
-            {
-                Payments.Add(payment);
-            }
+            _allFilteredPayments = payments;
+            TotalRecords = payments.Count;
+            TotalPages = (int)Math.Ceiling((double)TotalRecords / PageSize);
+            
+            // Reset to page 1 when loading new data
+            CurrentPage = 1;
+            LoadPage();
         }
         finally
         {
             IsLoading = false;
+        }
+    }
+
+    private void LoadPage()
+    {
+        var pagedPayments = _allFilteredPayments
+            .Skip((CurrentPage - 1) * PageSize)
+            .Take(PageSize)
+            .ToList();
+
+        Payments.Clear();
+        foreach (var payment in pagedPayments)
+        {
+            Payments.Add(payment);
         }
     }
 
@@ -133,6 +163,46 @@ public partial class HistoryViewModel : ViewModelBase
             {
                 MessageBox.Show("Failed to delete token", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+    }
+
+    [RelayCommand]
+    private void FirstPage()
+    {
+        if (CurrentPage != 1)
+        {
+            CurrentPage = 1;
+            LoadPage();
+        }
+    }
+
+    [RelayCommand]
+    private void PreviousPage()
+    {
+        if (CurrentPage > 1)
+        {
+            CurrentPage--;
+            LoadPage();
+        }
+    }
+
+    [RelayCommand]
+    private void NextPage()
+    {
+        if (CurrentPage < TotalPages)
+        {
+            CurrentPage++;
+            LoadPage();
+        }
+    }
+
+    [RelayCommand]
+    private void LastPage()
+    {
+        if (CurrentPage != TotalPages)
+        {
+            CurrentPage = TotalPages;
+            LoadPage();
         }
     }
 }

@@ -10,7 +10,8 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="2*"/>
+            <RowDefinition Height="4*"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
@@ -23,57 +24,52 @@
                    Foreground="#2C3E50"
                    Margin="0,0,0,20"/>
         
-        <!-- Filter Section -->
-        <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,10">
-            <StackPanel>
-                <TextBlock Text="Filters" 
-                           FontSize="16" 
-                           FontWeight="SemiBold"
-                           Margin="0,0,0,10"/>
+        <!-- Filter Section - Compact Single Row -->
+        <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
                 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    
-                    <StackPanel Grid.Column="0" Margin="0,0,15,0">
-                        <Label Content="Start Date:"/>
-                        <DatePicker SelectedDate="{Binding StartDate}" Width="150"/>
-                    </StackPanel>
-                    
-                    <StackPanel Grid.Column="1" Margin="0,0,15,0">
-                        <Label Content="End Date:"/>
-                        <DatePicker SelectedDate="{Binding EndDate}" Width="150"/>
-                    </StackPanel>
-                    
-                    <StackPanel Grid.Column="2" Margin="0,0,15,0">
-                        <Label Content="Search:"/>
-                        <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                                 Height="32"
-                                 VerticalContentAlignment="Center"
-                                 ToolTip="Search by meter number, token, transaction ID, or customer name"/>
-                    </StackPanel>
-                    
-                    <StackPanel Grid.Column="3" VerticalAlignment="Bottom">
-                        <Button Content="🔍 Filter" 
-                                Command="{Binding ApplyFilterCommand}"
-                                Style="{StaticResource PrimaryButtonStyle}"
-                                Width="100"/>
-                        <Button Content="🔄 Clear" 
-                                Command="{Binding ClearFilterCommand}"
-                                Style="{StaticResource DangerButtonStyle}"
-                                Width="100"
-                                Margin="0,5,0,0"/>
-                    </StackPanel>
-                </Grid>
-            </StackPanel>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="0,0,10,0">
+                    <TextBlock Text="From:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                    <DatePicker SelectedDate="{Binding StartDate}" Width="120"/>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,10,0">
+                    <TextBlock Text="To:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                    <DatePicker SelectedDate="{Binding EndDate}" Width="120"/>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="0,0,10,0">
+                    <TextBlock Text="Search:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                    <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                             Width="250"
+                             Height="28"
+                             VerticalContentAlignment="Center"/>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="3" Orientation="Horizontal">
+                    <Button Content="🔍 Filter" 
+                            Command="{Binding ApplyFilterCommand}"
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            Width="90"
+                            Height="34"
+                            Margin="0,0,5,0"/>
+                    <Button Content="🔄 Clear" 
+                            Command="{Binding ClearFilterCommand}"
+                            Style="{StaticResource DangerButtonStyle}"
+                            Width="90"
+                            Height="34"/>
+                </StackPanel>
+            </Grid>
         </Border>
         
-        <!-- Simplified Data Grid - Main List -->
-        <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,0,0,10">
+        <!-- Data Grid - Fixed Height for 10 Rows -->
+        <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="0">
             <DataGrid ItemsSource="{Binding Payments}"
                       SelectedItem="{Binding SelectedPayment}"
                       AutoGenerateColumns="False"
@@ -85,7 +81,10 @@
                       HeadersVisibility="Column"
                       AlternatingRowBackground="#f8f9fa"
                       RowHeight="35"
-                      FontSize="13">
+                      FontSize="13"
+                      Height="385"
+                      VerticalScrollBarVisibility="Disabled"
+                      HorizontalScrollBarVisibility="Auto">
                 
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Date" 
@@ -239,20 +238,43 @@
             </DataGrid>
         </Border>
         
-        <!-- Action Buttons -->
-        <StackPanel Grid.Row="3" 
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Right"
-                    Margin="0,0,0,10">
-            <Button Content="🖨️ Print" 
-                    Command="{Binding PrintSelectedCommand}"
-                    Style="{StaticResource PrimaryButtonStyle}"/>
-            <Button Content="🗑️ Delete" 
-                    Command="{Binding DeleteSelectedCommand}"
-                    Style="{StaticResource DangerButtonStyle}"/>
-        </StackPanel>
+        <!-- Compact Pagination + Actions Row -->
+        <Border Grid.Row="3" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Left: Page Info -->
+                <TextBlock Grid.Column="0" VerticalAlignment="Center" FontSize="13" Margin="0,0,15,0">
+                    <Run Text="Page "/>
+                    <Run Text="{Binding CurrentPage}" FontWeight="Bold"/>
+                    <Run Text="/"/>
+                    <Run Text="{Binding TotalPages}" FontWeight="Bold"/>
+                    <Run Text=" • "/>
+                    <Run Text="{Binding TotalRecords}"/>
+                    <Run Text=" records"/>
+                </TextBlock>
+                
+                <!-- Center: Pagination -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="⏮️ First" Command="{Binding FirstPageCommand}" Style="{StaticResource PrimaryButtonStyle}" Width="80" Height="38" Margin="3,0"/>
+                    <Button Content="◀️ Prev" Command="{Binding PreviousPageCommand}" Style="{StaticResource PrimaryButtonStyle}" Width="75" Height="38" Margin="3,0"/>
+                    <Button Content="Next ▶️" Command="{Binding NextPageCommand}" Style="{StaticResource PrimaryButtonStyle}" Width="75" Height="38" Margin="3,0"/>
+                    <Button Content="Last ⏭️" Command="{Binding LastPageCommand}" Style="{StaticResource PrimaryButtonStyle}" Width="80" Height="38" Margin="3,0"/>
+                </StackPanel>
+                
+                <!-- Right: Actions -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Button Content="🖨️ Print" Command="{Binding PrintSelectedCommand}" Style="{StaticResource PrimaryButtonStyle}" Width="85" Height="38" Margin="3,0"/>
+                    <Button Content="🗑️ Delete" Command="{Binding DeleteSelectedCommand}" Style="{StaticResource DangerButtonStyle}" Width="100" Height="38" Margin="3,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
         
-        <!-- Selected Token Details Panel -->
+        <!-- Selected Token Details Panel - Compact -->
         <Border Grid.Row="4" 
                 Style="{StaticResource CardStyle}"
                 Visibility="{Binding SelectedPayment, Converter={StaticResource StringToVisibilityConverter}}">

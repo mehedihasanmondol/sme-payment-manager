@@ -1,5 +1,8 @@
 @echo off
 echo Publishing Bill Payment Manager...
+dotnet clean
+dotnet restore
+dotnet build
 dotnet publish src/BillPaymentManager/BillPaymentManager.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
 echo.
 echo Publish complete! 

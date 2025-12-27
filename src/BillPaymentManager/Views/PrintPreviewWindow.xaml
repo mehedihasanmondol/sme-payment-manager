@@ -33,13 +33,13 @@
                         Width="400">
                     <StackPanel>
                         <!-- Header -->
-                        <TextBlock Text="তাসকিন ডিজিটাল স্টুডিও" 
+                        <TextBlock Text="{Binding ReceiptSettings.BusinessName}" 
                                    FontSize="24" 
                                    FontWeight="Bold" 
                                    TextAlignment="Center"
                                    Margin="0,0,0,5"/>
                         
-                        <TextBlock Text="মেহেরী বাজার, ডিভ অফিসের নিচে" 
+                        <TextBlock Text="{Binding ReceiptSettings.Address}" 
                                    FontSize="12" 
                                    TextAlignment="Center"
                                    Margin="0,0,0,2"/>
@@ -49,27 +49,25 @@
                                    TextAlignment="Center"
                                    Margin="0,0,0,2">
                             <Run Text="মোবাইল: "/>
-                            <Run Text="{Binding MobileNumber, FallbackValue='০১৮১৫৫৫৫৫৯৮'}"/>
+                            <Run Text="{Binding ReceiptSettings.PhoneNumber}"/>
                         </TextBlock>
                         
-                        <TextBlock FontSize="12" 
+                        <TextBlock Text="{Binding ReceiptSettings.OwnerName}" 
+                                   FontSize="12" 
                                    FontWeight="SemiBold"
                                    TextAlignment="Center"
-                                   Margin="0,0,0,2">
-                            <Run Text="প্রোঃ মোঃ মাহাবুব"/>
-                        </TextBlock>
+                                   Margin="0,0,0,2"/>
                         
-                        <TextBlock FontSize="11" 
+                        <TextBlock Text="{Binding ReceiptSettings.Location}" 
+                                   FontSize="11" 
                                    TextAlignment="Center"
-                                   Margin="0,0,0,2">
-                            <Run Text="রূপসা, রূপগঞ্জ, নারায়ণগঞ্জ"/>
-                        </TextBlock>
+                                   Margin="0,0,0,2"/>
                         
                         <TextBlock FontSize="11" 
                                    TextAlignment="Center"
                                    Margin="0,0,0,10">
                             <Run Text="তারিখ: "/>
-                            <Run Text="{Binding PaymentDate, StringFormat='dd-MM-yyyy hh:mm:ss tt'}"/>
+                            <Run Text="{Binding Payment.PaymentDate, StringFormat='dd-MM-yyyy hh:mm:ss tt'}"/>
                         </TextBlock>
                         
                         <!-- Separator Line -->
@@ -80,7 +78,7 @@
                         </Border>
                         
                         <!-- Main Title -->
-                        <TextBlock Text="পল্লী বিদ্যুৎ প্রিপেইড রশিদ" 
+                        <TextBlock Text="{Binding ReceiptSettings.ReceiptTitle}" 
                                    FontSize="18" 
                                    FontWeight="Bold" 
                                    TextAlignment="Center"
@@ -108,19 +106,19 @@
                             <TextBlock Grid.Row="0" Grid.Column="0" Text="মিটার নম্বর" FontSize="12" Margin="0,3"/>
                             <TextBlock Grid.Row="0" Grid.Column="1" FontSize="12" Margin="0,3" TextAlignment="Right">
                                 <Run Text=": "/>
-                                <Run Text="{Binding MeterNumber, FallbackValue='N/A'}"/>
+                                <Run Text="{Binding Payment.MeterNumber, FallbackValue='N/A'}"/>
                             </TextBlock>
                             
                             <TextBlock Grid.Row="1" Grid.Column="0" Text="গ্রাহক নাম" FontSize="12" Margin="0,3"/>
                             <TextBlock Grid.Row="1" Grid.Column="1" FontSize="12" Margin="0,3" TextAlignment="Right">
                                 <Run Text=": "/>
-                                <Run Text="{Binding CustomerName, FallbackValue='N/A'}"/>
+                                <Run Text="{Binding Payment.CustomerName, FallbackValue='N/A'}"/>
                             </TextBlock>
                             
                             <TextBlock Grid.Row="2" Grid.Column="0" Text="সিকুয়েন্স নম্বর" FontSize="12" Margin="0,3"/>
                             <TextBlock Grid.Row="2" Grid.Column="1" FontSize="12" Margin="0,3" TextAlignment="Right">
                                 <Run Text=": "/>
-                                <Run Text="{Binding SequenceNumber, FallbackValue='N/A'}"/>
+                                <Run Text="{Binding Payment.SequenceNumber, FallbackValue='N/A'}"/>
                             </TextBlock>
                         </Grid>
                         
@@ -226,13 +224,13 @@
                         </Border>
                         
                         <!-- Footer -->
-                        <TextBlock Text="ধন্যবাদ, তাসকিন ডিজিটাল স্টুডিও।" 
+                        <TextBlock Text="{Binding ReceiptSettings.FooterText}" 
                                    FontSize="12" 
                                    FontWeight="SemiBold"
                                    TextAlignment="Center"
                                    Margin="0,5,0,2"/>
                         
-                        <TextBlock Text="Developed by: Mehedi Hasan Mondol" 
+                        <TextBlock Text="{Binding ReceiptSettings.DeveloperCredit}" 
                                    FontSize="10" 
                                    TextAlignment="Center"
                                    Foreground="#666"

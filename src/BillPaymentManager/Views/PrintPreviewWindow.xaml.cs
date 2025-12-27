@@ -15,13 +15,18 @@ public partial class PrintPreviewWindow : Window
 {
     private readonly Payment _payment;
     private readonly IPdfService _pdfService;
+    private readonly ReceiptSettings _receiptSettings;
+    
+    public ReceiptSettings ReceiptSettings => _receiptSettings;
+    public Payment Payment => _payment;
     
     public PrintPreviewWindow(Payment payment)
     {
         InitializeComponent();
         _payment = payment;
         _pdfService = new PdfService();
-        DataContext = payment;
+        _receiptSettings = PrintSettingsManager.LoadReceiptSettings();
+        DataContext = this; // Changed to bind to window itself for both payment and settings
     }
     
     private void PrintButton_Click(object sender, RoutedEventArgs e)
@@ -239,19 +244,19 @@ public partial class PrintPreviewWindow : Window
         }
         
         // Header
-        DrawCenteredText("তাসকিন ডিজিটাল স্টুডিও", titleFont, System.Drawing.Brushes.Black, ref yPos, 25);
-        DrawCenteredText("মেহেরী বাজার, ডিভ অফিসের নিচে", normalFont, System.Drawing.Brushes.Black, ref yPos, 18);
-        DrawCenteredText("মোবাইল: ০১৮১৫৫৫৫৫৯৮", normalFont, System.Drawing.Brushes.Black, ref yPos, 18);
-        DrawCenteredText("প্রোঃ মোঃ মাহাবুব", normalFont, System.Drawing.Brushes.Black, ref yPos, 18);
-        DrawCenteredText("রূপসা, রূপগঞ্জ, নারায়ণগঞ্জ", smallFont, System.Drawing.Brushes.Black, ref yPos, 18);
-        DrawCenteredText($"তারিখ: {_payment.PaymentDate:dd-MM-yyyy hh:mm:ss tt}", smallFont, System.Drawing.Brushes.Black, ref yPos, 15);
-        
-        DrawLine(ref yPos, 10);
-        
-        // Main Title
-        DrawCenteredText("পল্লী বিদ্যুৎ প্রিপেইড রশিদ", headerFont, System.Drawing.Brushes.Black, ref yPos, 15);
+        DrawCenteredText(_receiptSettings.BusinessName, titleFont, System.Drawing.Brushes.Black, ref yPos, 30);
+        DrawCenteredText(_receiptSettings.Address, normalFont, System.Drawing.Brushes.Black, ref yPos, 20);
+        DrawCenteredText($"মোবাইল: {_receiptSettings.PhoneNumber}", normalFont, System.Drawing.Brushes.Black, ref yPos, 20);
+        DrawCenteredText(_receiptSettings.OwnerName, normalFont, System.Drawing.Brushes.Black, ref yPos, 20);
+        DrawCenteredText(_receiptSettings.Location, smallFont, System.Drawing.Brushes.Black, ref yPos, 20);
+        DrawCenteredText($"তারিখ: {_payment.PaymentDate:dd-MM-yyyy hh:mm:ss tt}", smallFont, System.Drawing.Brushes.Black, ref yPos, 20);
         
         DrawLine(ref yPos, 15);
+        
+        // Main Title
+        DrawCenteredText(_receiptSettings.ReceiptTitle, headerFont, System.Drawing.Brushes.Black, ref yPos, 20);
+        
+        DrawLine(ref yPos, 20);
         
         // Details Section
         var detailsLeftMargin = leftMargin + 10;
@@ -263,15 +268,15 @@ public partial class PrintPreviewWindow : Window
             var valueSize = e.Graphics.MeasureString($": {value}", normalFont);
             e.Graphics.DrawString($": {value}", normalFont, System.Drawing.Brushes.Black, 
                 detailsRightMargin - valueSize.Width, y);
-            y += 20;
+            y += 25; // Increased from 20 to 25 for better spacing
         }
         
         DrawDetail("মিটার নম্বর", _payment.MeterNumber ?? "N/A", ref yPos);
         DrawDetail("গ্রাহক নাম", _payment.CustomerName ?? "N/A", ref yPos);
         DrawDetail("সিকুয়েন্স নম্বর", _payment.SequenceNumber?.ToString() ?? "N/A", ref yPos);
         
-        yPos += 5;
-        DrawLine(ref yPos, 15);
+        yPos += 10; // Increased spacing
+        DrawLine(ref yPos, 20);
         
         // Cost Breakdown
         DrawDetail("Energy Cost", $"{_payment.EnergyCost:N2}", ref yPos);
@@ -281,25 +286,25 @@ public partial class PrintPreviewWindow : Window
         DrawDetail("Rebate", $"{_payment.Rebate:N2}", ref yPos);
         DrawDetail("Transaction ID", _payment.TransactionId ?? "(Not Provided)", ref yPos);
         
-        yPos += 5;
+        yPos += 10; // Added spacing before total
         
         // Total Amount
         e.Graphics.DrawString("মোট পরিমাণ", headerFont, System.Drawing.Brushes.Black, detailsLeftMargin, yPos);
         var totalSize = e.Graphics.MeasureString($": {_payment.VendingAmount:N2}", headerFont);
         e.Graphics.DrawString($": {_payment.VendingAmount:N2}", headerFont, System.Drawing.Brushes.Black, 
             detailsRightMargin - totalSize.Width, yPos);
-        yPos += 30;
+        yPos += 35; // Increased spacing after total
         
-        DrawLine(ref yPos, 15);
+        DrawLine(ref yPos, 20);
         
         // Token Section
-        DrawCenteredText("Token", headerFont, System.Drawing.Brushes.Black, ref yPos, 10);
-        DrawCenteredText(_payment.Token ?? "N/A", tokenFont, System.Drawing.Brushes.Black, ref yPos, 15);
+        DrawCenteredText("Token", headerFont, System.Drawing.Brushes.Black, ref yPos, 15);
+        DrawCenteredText(_payment.Token ?? "N/A", tokenFont, System.Drawing.Brushes.Black, ref yPos, 20);
         
-        DrawLine(ref yPos, 15);
+        DrawLine(ref yPos, 20);
         
         // Footer
-        DrawCenteredText("ধন্যবাদ, তাসকিন ডিজিটাল স্টুডিও।", normalFont, System.Drawing.Brushes.Black, ref yPos, 15);
-        DrawCenteredText("Developed by: Abu Kahar Siddiq", smallFont, System.Drawing.Brushes.Gray, ref yPos, 10);
+        DrawCenteredText(_receiptSettings.FooterText, normalFont, System.Drawing.Brushes.Black, ref yPos, 20);
+        DrawCenteredText(_receiptSettings.DeveloperCredit, smallFont, System.Drawing.Brushes.Gray, ref yPos, 15);
     }
 }

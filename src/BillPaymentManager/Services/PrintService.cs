@@ -19,8 +19,9 @@ public class PrintService : IPrintService
     
     public void PrintReceipt(Payment payment)
     {
+        var receiptSettings = PrintSettingsManager.LoadReceiptSettings();
         PrintDocument printDoc = new PrintDocument();
-        printDoc.PrintPage += (sender, e) => PrintPage(payment, e);
+        printDoc.PrintPage += (sender, e) => PrintPage(payment, receiptSettings, e);
 
         try
         {
@@ -37,7 +38,7 @@ public class PrintService : IPrintService
         }
     }
 
-    private void PrintPage(Payment payment, PrintPageEventArgs e)
+    private void PrintPage(Payment payment, ReceiptSettings settings, PrintPageEventArgs e)
     {
         if (e.Graphics == null) return;
         
@@ -68,19 +69,19 @@ public class PrintService : IPrintService
         }
         
         // Header
-        DrawCenteredText("তাসকিন ডিজিটাল স্টুডিও", titleFont, Brushes.Black, ref yPos, 25);
-        DrawCenteredText("মেহেরী বাজার, ডিভ অফিসের নিচে", normalFont, Brushes.Black, ref yPos, 18);
-        DrawCenteredText("মোবাইল: ০১৮১৫৫৫৫৫৯৮", normalFont, Brushes.Black, ref yPos, 18);
-        DrawCenteredText("প্রোঃ মোঃ মাহাবুব", normalFont, Brushes.Black, ref yPos, 18);
-        DrawCenteredText("রূপসা, রূপগঞ্জ, নারায়ণগঞ্জ", smallFont, Brushes.Black, ref yPos, 18);
-        DrawCenteredText($"তারিখ: {payment.PaymentDate:dd-MM-yyyy hh:mm:ss tt}", smallFont, Brushes.Black, ref yPos, 15);
-        
-        DrawLine(ref yPos, 10);
-        
-        // Main Title
-        DrawCenteredText("পল্লী বিদ্যুৎ প্রিপেইড রশিদ", headerFont, Brushes.Black, ref yPos, 15);
+        DrawCenteredText(settings.BusinessName, titleFont, Brushes.Black, ref yPos, 30);
+        DrawCenteredText(settings.Address, normalFont, Brushes.Black, ref yPos, 20);
+        DrawCenteredText($"মোবাইল: {settings.PhoneNumber}", normalFont, Brushes.Black, ref yPos, 20);
+        DrawCenteredText(settings.OwnerName, normalFont, Brushes.Black, ref yPos, 20);
+        DrawCenteredText(settings.Location, smallFont, Brushes.Black, ref yPos, 20);
+        DrawCenteredText($"তারিখ: {payment.PaymentDate:dd-MM-yyyy hh:mm:ss tt}", smallFont, Brushes.Black, ref yPos, 20);
         
         DrawLine(ref yPos, 15);
+        
+        // Main Title
+        DrawCenteredText(settings.ReceiptTitle, headerFont, Brushes.Black, ref yPos, 20);
+        
+        DrawLine(ref yPos, 20);
         
         // Details Section
         var detailsLeftMargin = leftMargin + 10;
@@ -92,15 +93,15 @@ public class PrintService : IPrintService
             var valueSize = e.Graphics.MeasureString($": {value}", normalFont);
             e.Graphics.DrawString($": {value}", normalFont, Brushes.Black, 
                 detailsRightMargin - valueSize.Width, y);
-            y += 20;
+            y += 25; // Increased from 20 to 25 for better spacing
         }
         
         DrawDetail("মিটার নম্বর", payment.MeterNumber ?? "N/A", ref yPos);
         DrawDetail("গ্রাহক নাম", payment.CustomerName ?? "N/A", ref yPos);
         DrawDetail("সিকুয়েন্স নম্বর", payment.SequenceNumber?.ToString() ?? "N/A", ref yPos);
         
-        yPos += 5;
-        DrawLine(ref yPos, 15);
+        yPos += 10; // Increased spacing
+        DrawLine(ref yPos, 20);
         
         // Cost Breakdown
         DrawDetail("Energy Cost", $"{payment.EnergyCost:N2}", ref yPos);
@@ -110,25 +111,25 @@ public class PrintService : IPrintService
         DrawDetail("Rebate", $"{payment.Rebate:N2}", ref yPos);
         DrawDetail("Transaction ID", payment.TransactionId ?? "(Not Provided)", ref yPos);
         
-        yPos += 5;
+        yPos += 10; // Added spacing before total
         
         // Total Amount
         e.Graphics.DrawString("মোট পরিমাণ", headerFont, Brushes.Black, detailsLeftMargin, yPos);
         var totalSize = e.Graphics.MeasureString($": {payment.VendingAmount:N2}", headerFont);
         e.Graphics.DrawString($": {payment.VendingAmount:N2}", headerFont, Brushes.Black, 
             detailsRightMargin - totalSize.Width, yPos);
-        yPos += 30;
+        yPos += 35; // Increased spacing after total
         
-        DrawLine(ref yPos, 15);
+        DrawLine(ref yPos, 20);
         
         // Token Section
-        DrawCenteredText("Token", headerFont, Brushes.Black, ref yPos, 10);
-        DrawCenteredText(payment.Token ?? "N/A", tokenFont, Brushes.Black, ref yPos, 15);
+        DrawCenteredText("Token", headerFont, Brushes.Black, ref yPos, 15);
+        DrawCenteredText(payment.Token ?? "N/A", tokenFont, Brushes.Black, ref yPos, 20);
         
-        DrawLine(ref yPos, 15);
+        DrawLine(ref yPos, 20);
         
         // Footer
-        DrawCenteredText("ধন্যবাদ, তাসকিন ডিজিটাল স্টুডিও।", normalFont, Brushes.Black, ref yPos, 15);
-        DrawCenteredText("Developed by: Abu Kahar Siddiq", smallFont, Brushes.Gray, ref yPos, 10);
+        DrawCenteredText(settings.FooterText, normalFont, Brushes.Black, ref yPos, 20);
+        DrawCenteredText(settings.DeveloperCredit, smallFont, Brushes.Gray, ref yPos, 15);
     }
 }

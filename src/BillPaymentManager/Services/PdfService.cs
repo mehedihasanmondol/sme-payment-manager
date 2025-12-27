@@ -51,12 +51,15 @@ public class PdfService : IPdfService
     
     public byte[] GeneratePdfToMemory(Payment payment)
     {
-        var document = CreateDocument(payment);
+        var document = CreateDocument(payment)
+;
         return document.GeneratePdf();
     }
     
     private Document CreateDocument(Payment payment)
     {
+        var settings = PrintSettingsManager.LoadReceiptSettings();
+        
         return Document.Create(container =>
         {
             container.Page(page =>
@@ -70,19 +73,19 @@ public class PdfService : IPdfService
                     column.Spacing(5);
                     
                     // Header
-                    column.Item().AlignCenter().Text("তাসকিন ডিজিটাল স্টুডিও")
+                    column.Item().AlignCenter().Text(settings.BusinessName)
                         .FontSize(20).Bold().FontFamily(BanglaFontName);
                     
-                    column.Item().AlignCenter().Text("মেহেরী বাজার, ডিভ অফিসের নিচে")
+                    column.Item().AlignCenter().Text(settings.Address)
                         .FontSize(12).FontFamily(BanglaFontName);
                     
-                    column.Item().AlignCenter().Text("মোবাইল: ০১৮১৫৫৫৫৫৯৮")
+                    column.Item().AlignCenter().Text($"মোবাইল: {settings.PhoneNumber}")
                         .FontSize(12).FontFamily(BanglaFontName);
                     
-                    column.Item().AlignCenter().Text("প্রোঃ মোঃ মাহাবুব")
+                    column.Item().AlignCenter().Text(settings.OwnerName)
                         .FontSize(12).FontFamily(BanglaFontName);
                     
-                    column.Item().AlignCenter().Text("রূপসা, রূপগঞ্জ, নারায়ণগঞ্জ")
+                    column.Item().AlignCenter().Text(settings.Location)
                         .FontSize(11).FontFamily(BanglaFontName);
                     
                     column.Item().AlignCenter().Text($"তারিখ: {payment.PaymentDate:dd-MM-yyyy hh:mm:ss tt}")
@@ -92,7 +95,7 @@ public class PdfService : IPdfService
                     column.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Black);
                     
                     // Main Title
-                    column.Item().AlignCenter().PaddingVertical(5).Text("পল্লী বিদ্যুৎ প্রিপেইড রশিদ")
+                    column.Item().AlignCenter().PaddingVertical(5).Text(settings.ReceiptTitle)
                         .FontSize(16).Bold().FontFamily(BanglaFontName);
                     
                     // Separator
@@ -180,10 +183,10 @@ public class PdfService : IPdfService
                     column.Item().PaddingVertical(10).LineHorizontal(1).LineColor(Colors.Black);
                     
                     // Footer
-                    column.Item().AlignCenter().Text("ধন্যবাদ, তাসকিন ডিজিটাল স্টুডিও।")
+                    column.Item().AlignCenter().Text(settings.FooterText)
                         .FontSize(12).FontFamily(BanglaFontName);
                     
-                    column.Item().AlignCenter().PaddingTop(5).Text("Developed by: Abu Kahar Siddiq")
+                    column.Item().AlignCenter().PaddingTop(5).Text(settings.DeveloperCredit)
                         .FontSize(9).FontColor(Colors.Grey.Medium);
                 });
             });
